@@ -671,6 +671,7 @@ const assetGeneratorDataUrl = assetGeneratorDataUrlOptions.or(
 export type AssetGeneratorDataUrl = z.infer<typeof assetGeneratorDataUrl>;
 
 const assetInlineGeneratorOptions = z.strictObject({
+	binary: z.boolean().optional(),
 	dataUrl: assetGeneratorDataUrl.optional()
 });
 export type AssetInlineGeneratorOptions = z.infer<
@@ -678,6 +679,7 @@ export type AssetInlineGeneratorOptions = z.infer<
 >;
 
 const assetResourceGeneratorOptions = z.strictObject({
+	binary: z.boolean().optional(),
 	emit: z.boolean().optional(),
 	filename: filename.optional(),
 	publicPath: publicPath.optional()

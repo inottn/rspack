@@ -417,6 +417,13 @@ module.exports = {
 
 `asset` 模块的生成器选项。
 
+#### module.generator["asset/inline"].binary
+
+- **类型：** `boolean`
+- **默认值：** `undefined`
+
+标识资源是否应被视为二进制文件。设置为 `false` 则将其作为文本处理。
+
 #### module.generator.asset.dataUrl
 
 - **类型：** `Object | (options: { content: string, filename: string }) => string`
@@ -551,6 +558,10 @@ module.exports = {
 
 `asset/inline` 模块的生成器选项。
 
+#### module.generator["asset/inline"].binary
+
+和 [`module.generator["asset"].binary`](#modulegeneratorassetbinary) 一样。
+
 #### module.generator["asset/inline"].dataUrl
 
 和 [`module.generator["asset"].dataUrl`](#modulegeneratorassetdataurl) 一样。
@@ -566,6 +577,10 @@ module.exports = {
 ### module.generator["asset/resource"]
 
 `asset/resource` 模块的生成器选项。
+
+#### module.generator["asset/resource"].binary
+
+和 [`module.generator["asset"].binary`](#modulegeneratorassetbinary) 一样。
 
 #### module.generator["asset/resource"].filename
 

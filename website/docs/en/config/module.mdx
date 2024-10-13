@@ -417,6 +417,13 @@ module.exports = {
 
 Generator options for `asset` modules.
 
+#### module.generator.asset.binary
+
+- **Type:** `boolean`
+- **Default:** `undefined`
+
+Indicates if this asset should be treated as binary. Set to 'false' to handle it as text instead.
+
 #### module.generator.asset.dataUrl
 
 - **Type:** `Object | (options: { content: string, filename: string }) => string`
@@ -551,6 +558,10 @@ module.exports = {
 
 Generator options for `asset/inline` modules.
 
+#### module.generator["asset/inline"].binary
+
+Same as [`module.generator["asset"].binary`](#modulegeneratorassetbinary).
+
 #### module.generator["asset/inline"].dataUrl
 
 Same as [`module.generator["asset"].dataUrl`](#modulegeneratorassetdataurl).
@@ -566,6 +577,10 @@ Same as [`module.generator["asset"].dataUrl.mimetype`](#modulegeneratorassetdata
 ### module.generator["asset/resource"]
 
 Generator options for `asset/resource` modules.
+
+#### module.generator["asset/resource"].binary
+
+Same as [`module.generator["asset"].binary`](#modulegeneratorassetbinary).
 
 #### module.generator["asset/resource"].filename
 

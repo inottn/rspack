@@ -310,6 +310,14 @@ impl GeneratorOptions {
   get_variant!(get_css_auto, CssAuto, CssAutoGeneratorOptions);
   get_variant!(get_css_module, CssModule, CssModuleGeneratorOptions);
 
+  pub fn asset_binary(&self) -> Option<bool> {
+    self
+      .get_asset()
+      .and_then(|x| x.binary)
+      .or_else(|| self.get_asset_resource().and_then(|x| x.binary))
+      .or_else(|| self.get_asset_inline().and_then(|x| x.binary))
+  }
+
   pub fn asset_filename(&self) -> Option<&Filename> {
     self
       .get_asset()
@@ -345,11 +353,13 @@ impl GeneratorOptions {
 
 #[derive(Debug, Clone, MergeFrom)]
 pub struct AssetInlineGeneratorOptions {
+  pub binary: Option<bool>,
   pub data_url: Option<AssetGeneratorDataUrl>,
 }
 
 #[derive(Debug, Clone, MergeFrom)]
 pub struct AssetResourceGeneratorOptions {
+  pub binary: Option<bool>,
   pub emit: Option<bool>,
   pub filename: Option<Filename>,
   pub public_path: Option<PublicPath>,
@@ -357,6 +367,7 @@ pub struct AssetResourceGeneratorOptions {
 
 #[derive(Debug, Clone, MergeFrom)]
 pub struct AssetGeneratorOptions {
+  pub binary: Option<bool>,
   pub emit: Option<bool>,
   pub filename: Option<Filename>,
   pub public_path: Option<PublicPath>,

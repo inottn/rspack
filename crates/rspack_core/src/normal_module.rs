@@ -449,7 +449,12 @@ impl Module for NormalModule {
       .await?;
     self.add_diagnostics(ds);
 
-    let content = if self.module_type().is_binary() {
+    let is_binary_module = self
+      .get_generator_options()
+      .and_then(|options| options.asset_binary())
+      .unwrap_or(self.module_type().is_binary());
+
+    let content = if is_binary_module {
       Content::Buffer(loader_result.content.into_bytes())
     } else {
       Content::String(loader_result.content.into_string_lossy())

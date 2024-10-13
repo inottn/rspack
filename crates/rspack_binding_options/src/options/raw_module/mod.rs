@@ -493,6 +493,7 @@ impl From<RawGeneratorOptions> for GeneratorOptions {
 #[derivative(Debug)]
 #[napi(object, object_to_js = false)]
 pub struct RawAssetGeneratorOptions {
+  pub binary: Option<bool>,
   pub emit: Option<bool>,
   pub filename: Option<JsFilename>,
   #[napi(ts_type = "\"auto\" | JsFilename")]
@@ -507,6 +508,7 @@ pub struct RawAssetGeneratorOptions {
 impl From<RawAssetGeneratorOptions> for AssetGeneratorOptions {
   fn from(value: RawAssetGeneratorOptions) -> Self {
     Self {
+      binary: value.binary,
       emit: value.emit,
       filename: value.filename.map(|i| i.into()),
       public_path: value.public_path.map(|i| i.into()),
@@ -521,6 +523,7 @@ impl From<RawAssetGeneratorOptions> for AssetGeneratorOptions {
 #[derivative(Debug)]
 #[napi(object, object_to_js = false)]
 pub struct RawAssetInlineGeneratorOptions {
+  pub binary: Option<bool>,
   #[derivative(Debug = "ignore")]
   #[napi(
     ts_type = "RawAssetGeneratorDataUrlOptions | ((arg: RawAssetGeneratorDataUrlFnArgs) => string)"
@@ -531,6 +534,7 @@ pub struct RawAssetInlineGeneratorOptions {
 impl From<RawAssetInlineGeneratorOptions> for AssetInlineGeneratorOptions {
   fn from(value: RawAssetInlineGeneratorOptions) -> Self {
     Self {
+      binary: value.binary,
       data_url: value
         .data_url
         .map(|i| RawAssetGeneratorDataUrlWrapper(i).into()),
@@ -541,6 +545,7 @@ impl From<RawAssetInlineGeneratorOptions> for AssetInlineGeneratorOptions {
 #[derive(Debug, Default)]
 #[napi(object, object_to_js = false)]
 pub struct RawAssetResourceGeneratorOptions {
+  pub binary: Option<bool>,
   pub emit: Option<bool>,
   pub filename: Option<JsFilename>,
   #[napi(ts_type = "\"auto\" | JsFilename")]
@@ -550,6 +555,7 @@ pub struct RawAssetResourceGeneratorOptions {
 impl From<RawAssetResourceGeneratorOptions> for AssetResourceGeneratorOptions {
   fn from(value: RawAssetResourceGeneratorOptions) -> Self {
     Self {
+      binary: value.binary,
       emit: value.emit,
       filename: value.filename.map(|i| i.into()),
       public_path: value.public_path.map(|i| i.into()),

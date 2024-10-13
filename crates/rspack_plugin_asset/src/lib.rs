@@ -496,7 +496,7 @@ impl ParserAndGenerator for AssetParserAndGenerator {
             "Inline or Source asset does not have source type `asset`"
           ))
         } else {
-          Ok(RawSource::from(source.buffer().to_vec()).boxed())
+          Ok(source.clone().boxed())
         }
       }
       _ => panic!(

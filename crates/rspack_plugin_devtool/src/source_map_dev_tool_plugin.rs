@@ -31,6 +31,9 @@ static CSS_EXTENSION_DETECT_REGEXP: LazyLock<Regex> = LazyLock::new(|| {
 static URL_FORMATTING_REGEXP: LazyLock<Regex> = LazyLock::new(|| {
   Regex::new(r"^\n\/\/(.*)$").expect("failed to compile URL_FORMATTING_REGEXP regex")
 });
+static DATA_OR_HTTP_PROTOCOLS_REGEXP: LazyLock<Regex> = LazyLock::new(|| {
+  Regex::new(r"^(data|https?):").expect("failed to compile DATA_OR_HTTP_PROTOCOLS_REGEXP")
+});
 
 #[derive(Clone)]
 pub enum ModuleFilenameTemplate {
@@ -222,13 +225,18 @@ impl SourceMapDevToolPlugin {
       ModuleFilenameTemplate::String(s) => module_source_names
         .into_par_iter()
         .map(|module_or_source| {
-          let source_name = ModuleFilenameHelpers::create_filename_of_string_template(
-            module_or_source,
-            compilation,
-            s,
-            output_options,
-            &self.namespace,
-          );
+          let source_name = match module_or_source {
+            ModuleOrSource::Source(source) if DATA_OR_HTTP_PROTOCOLS_REGEXP.is_match(source) => {
+              source.to_owned()
+            }
+            _ => ModuleFilenameHelpers::create_filename_of_string_template(
+              module_or_source,
+              compilation,
+              s,
+              output_options,
+              &self.namespace,
+            ),
+          };
           (module_or_source, source_name)
         })
         .collect::<HashMap<_, _>>(),
@@ -236,14 +244,21 @@ impl SourceMapDevToolPlugin {
         let features = module_source_names
           .into_iter()
           .map(|module_or_source| async move {
-            let source_name = ModuleFilenameHelpers::create_filename_of_fn_template(
-              module_or_source,
-              compilation,
-              f,
-              output_options,
-              &self.namespace,
-            )
-            .await?;
+            let source_name = match module_or_source {
+              ModuleOrSource::Source(source) if DATA_OR_HTTP_PROTOCOLS_REGEXP.is_match(source) => {
+                source.to_owned()
+              }
+              _ => {
+                ModuleFilenameHelpers::create_filename_of_fn_template(
+                  module_or_source,
+                  compilation,
+                  f,
+                  output_options,
+                  &self.namespace,
+                )
+                .await?
+              }
+            };
             Ok((module_or_source, source_name))
           })
           .collect::<Vec<_>>();

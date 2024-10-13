@@ -1059,6 +1059,7 @@ export interface RawAssetGeneratorDataUrlOptions {
 }
 
 export interface RawAssetGeneratorOptions {
+  binary?: boolean
   emit?: boolean
   filename?: JsFilename
   publicPath?: "auto" | JsFilename
@@ -1066,6 +1067,7 @@ export interface RawAssetGeneratorOptions {
 }
 
 export interface RawAssetInlineGeneratorOptions {
+  binary?: boolean
   dataUrl?: RawAssetGeneratorDataUrlOptions | ((arg: RawAssetGeneratorDataUrlFnArgs) => string)
 }
 
@@ -1083,6 +1085,7 @@ export interface RawAssetParserOptions {
 }
 
 export interface RawAssetResourceGeneratorOptions {
+  binary?: boolean
   emit?: boolean
   filename?: JsFilename
   publicPath?: "auto" | JsFilename

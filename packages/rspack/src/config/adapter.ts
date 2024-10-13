@@ -796,6 +796,7 @@ function getRawAssetInlineGeneratorOptions(
 	options: AssetInlineGeneratorOptions
 ): RawAssetInlineGeneratorOptions {
 	return {
+		binary: options.binary,
 		dataUrl: options.dataUrl
 			? getRawAssetGeneratorDataUrl(options.dataUrl)
 			: undefined
@@ -806,6 +807,7 @@ function getRawAssetResourceGeneratorOptions(
 	options: AssetResourceGeneratorOptions
 ): RawAssetResourceGeneratorOptions {
 	return {
+		binary: options.binary,
 		emit: options.emit,
 		filename: options.filename,
 		publicPath: options.publicPath
