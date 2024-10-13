@@ -88,6 +88,7 @@ pub fn render_module(
     module,
     &mut render_source,
     &mut module_chunk_init_fragments,
+    chunk,
   )?;
   let mut sources = ConcatSource::default();
 

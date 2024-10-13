@@ -1,7 +1,7 @@
 use rspack_core::{
-  ApplyContext, BoxModule, ChunkInitFragments, Compilation, CompilationParams, CompilerCompilation,
-  CompilerOptions, InitFragmentExt, InitFragmentKey, InitFragmentStage, NormalInitFragment, Plugin,
-  PluginContext,
+  ApplyContext, BoxModule, Chunk, ChunkInitFragments, Compilation, CompilationParams,
+  CompilerCompilation, CompilerOptions, InitFragmentExt, InitFragmentKey, InitFragmentStage,
+  NormalInitFragment, Plugin, PluginContext,
 };
 use rspack_error::Result;
 use rspack_hook::{plugin, plugin_hook};
@@ -32,6 +32,7 @@ fn render_module_content(
   module: &BoxModule,
   _source: &mut RenderSource,
   init_fragments: &mut ChunkInitFragments,
+  _chunk: &Chunk,
 ) -> Result<()> {
   if let Some(build_info) = module.build_info()
     && build_info.need_create_require

@@ -164,6 +164,24 @@ impl SourceMapDevToolPlugin {
     )
   }
 
+  fn get_namespace_by_file(
+    &self,
+    compilation: &Compilation,
+    file_to_chunk: &HashMap<&String, &Chunk>,
+    file: &String,
+  ) -> String {
+    if let Some(chunk) = file_to_chunk.get(file) {
+      compilation
+        .get_path(
+          &FilenameTemplate::from(self.namespace.clone()),
+          PathData::default().chunk(chunk),
+        )
+        .always_ok()
+    } else {
+      self.namespace.clone()
+    }
+  }
+
   async fn map_assets(
     &self,
     compilation: &Compilation,
@@ -203,9 +221,16 @@ impl SourceMapDevToolPlugin {
 
     let source_map_modules = mapped_sources
       .par_iter()
-      .filter_map(|(_file, _asset, source_map)| source_map.as_ref())
-      .flat_map(|source_map| source_map.sources())
-      .map(|source| {
+      .filter_map(|(file, _asset, source_map)| {
+        source_map.as_ref().map(|source_map| (file, source_map))
+      })
+      .flat_map(|(file, source_map)| {
+        source_map
+          .sources()
+          .par_iter()
+          .map(move |source| (file, source))
+      })
+      .map(|(file, source)| {
         let module_or_source = if let Some(stripped) = source.strip_prefix("webpack://") {
           let source = make_paths_absolute(compilation.options.context.as_str(), stripped);
           let identifier = ModuleIdentifier::from(source.as_str());
@@ -219,7 +244,7 @@ impl SourceMapDevToolPlugin {
         } else {
           ModuleOrSource::Source(source.to_string())
         };
-        (source.to_string(), module_or_source)
+        (source.to_string(), (file.clone(), module_or_source))
       })
       .collect::<HashMap<_, _>>();
 
@@ -227,13 +252,14 @@ impl SourceMapDevToolPlugin {
     let mut module_to_source_name = match &self.module_filename_template {
       ModuleFilenameTemplate::String(s) => module_source_names
         .into_par_iter()
-        .map(|module_or_source| {
+        .map(|(file, module_or_source)| {
+          let namespace = self.get_namespace_by_file(compilation, file_to_chunk, file);
           let source_name = ModuleFilenameHelpers::create_filename_of_string_template(
             module_or_source,
             compilation,
             s,
             output_options,
-            &self.namespace,
+            &namespace,
           );
           (module_or_source, source_name)
         })
@@ -241,13 +267,14 @@ impl SourceMapDevToolPlugin {
       ModuleFilenameTemplate::Fn(f) => {
         let features = module_source_names
           .into_iter()
-          .map(|module_or_source| async move {
+          .map(|(file, module_or_source)| async move {
+            let namespace = self.get_namespace_by_file(compilation, file_to_chunk, file);
             let source_name = ModuleFilenameHelpers::create_filename_of_fn_template(
               module_or_source,
               compilation,
               f,
               output_options,
-              &self.namespace,
+              &namespace,
             )
             .await?;
             Ok((module_or_source, source_name))
@@ -327,7 +354,7 @@ impl SourceMapDevToolPlugin {
 
         let sources = source_map.sources_mut();
         for source in sources {
-          let module_or_source = source_map_modules
+          let (_file, module_or_source) = source_map_modules
             .get(source.as_ref())
             .expect("expected a module or source");
           let source_name = module_to_source_name

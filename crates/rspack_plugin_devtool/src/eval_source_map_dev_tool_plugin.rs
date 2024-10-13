@@ -5,9 +5,10 @@ use derivative::Derivative;
 use futures::future::join_all;
 use rspack_core::{
   rspack_sources::{BoxSource, MapOptions, RawSource, Source, SourceExt},
-  ApplyContext, BoxModule, ChunkInitFragments, ChunkUkey, Compilation,
+  ApplyContext, BoxModule, Chunk, ChunkInitFragments, ChunkUkey, Compilation,
   CompilationAdditionalTreeRuntimeRequirements, CompilationParams, CompilerCompilation,
-  CompilerOptions, ModuleIdentifier, Plugin, PluginContext, RuntimeGlobals,
+  CompilerOptions, FilenameTemplate, ModuleIdentifier, PathData, Plugin, PluginContext,
+  RuntimeGlobals,
 };
 use rspack_error::Result;
 use rspack_hash::RspackHash;
@@ -16,7 +17,7 @@ use rspack_plugin_javascript::{
   JavascriptModulesChunkHash, JavascriptModulesInlineInRuntimeBailout,
   JavascriptModulesRenderModuleContent, JsPlugin, RenderSource,
 };
-use rspack_util::identifier::make_paths_absolute;
+use rspack_util::{identifier::make_paths_absolute, infallible::ResultInfallibleExt};
 
 use crate::{
   module_filename_helpers::ModuleFilenameHelpers, ModuleFilenameTemplate, ModuleOrSource,
@@ -88,6 +89,7 @@ fn eval_source_map_devtool_plugin_render_module_content(
   module: &BoxModule,
   render_source: &mut RenderSource,
   _init_fragments: &mut ChunkInitFragments,
+  chunk: &Chunk,
 ) -> Result<()> {
   let output_options = &compilation.options.output;
 
@@ -100,6 +102,12 @@ fn eval_source_map_devtool_plugin_render_module_content(
       let source = &origin_source.source();
 
       {
+        let namespace = compilation
+          .get_path(
+            &FilenameTemplate::from(self.namespace.clone()),
+            PathData::default().chunk(chunk),
+          )
+          .always_ok();
         let sources = map.sources_mut();
         let modules = sources.iter().map(|source| {
           if let Some(stripped) = source.strip_prefix("webpack://") {
@@ -124,7 +132,7 @@ fn eval_source_map_devtool_plugin_render_module_content(
                 compilation,
                 s,
                 output_options,
-                &self.namespace,
+                &namespace,
               )
             })
             .collect::<Vec<_>>(),
@@ -136,7 +144,7 @@ fn eval_source_map_devtool_plugin_render_module_content(
                 compilation,
                 f,
                 output_options,
-                &self.namespace,
+                &namespace,
               )
             });
             futures::executor::block_on(join_all(features))

@@ -10,7 +10,9 @@ use rspack_core::{
   ApplyContext, BoxModule, ChunkInitFragments, ChunkUkey, Compilation, CompilationParams,
   CompilerCompilation, CompilerOptions, Plugin, PluginContext,
 };
-use rspack_core::{CompilationAdditionalTreeRuntimeRequirements, RuntimeGlobals};
+use rspack_core::{
+  Chunk, CompilationAdditionalTreeRuntimeRequirements, FilenameTemplate, PathData, RuntimeGlobals,
+};
 use rspack_error::Result;
 use rspack_hash::RspackHash;
 use rspack_hook::{plugin, plugin_hook};
@@ -18,6 +20,7 @@ use rspack_plugin_javascript::{
   JavascriptModulesChunkHash, JavascriptModulesInlineInRuntimeBailout,
   JavascriptModulesRenderModuleContent, JsPlugin, RenderSource,
 };
+use rspack_util::infallible::ResultInfallibleExt;
 
 use crate::{
   module_filename_helpers::ModuleFilenameHelpers, ModuleFilenameTemplate, ModuleOrSource,
@@ -96,6 +99,7 @@ fn eval_devtool_plugin_render_module_content(
   module: &BoxModule,
   render_source: &mut RenderSource,
   _init_fragments: &mut ChunkInitFragments,
+  chunk: &Chunk,
 ) -> Result<()> {
   let origin_source = render_source.source.clone();
   if let Some(cached_source) = self.cache.get(&origin_source) {
@@ -106,13 +110,19 @@ fn eval_devtool_plugin_render_module_content(
   }
 
   let output_options = &compilation.options.output;
+  let namespace = compilation
+    .get_path(
+      &FilenameTemplate::from(self.namespace.clone()),
+      PathData::default().chunk(chunk),
+    )
+    .always_ok();
   let str = match &self.module_filename_template {
     ModuleFilenameTemplate::String(s) => ModuleFilenameHelpers::create_filename_of_string_template(
       &ModuleOrSource::Module(module.identifier()),
       compilation,
       s,
       output_options,
-      &self.namespace,
+      &namespace,
     ),
     ModuleFilenameTemplate::Fn(f) => {
       futures::executor::block_on(ModuleFilenameHelpers::create_filename_of_fn_template(
@@ -120,7 +130,7 @@ fn eval_devtool_plugin_render_module_content(
         compilation,
         f,
         output_options,
-        &self.namespace,
+        &namespace,
       ))?
     }
   };
