@@ -187,55 +187,55 @@ fn runtime_requirements_in_tree(
   runtime_requirements: &RuntimeGlobals,
   runtime_requirements_mut: &mut RuntimeGlobals,
 ) -> Result<Option<()>> {
-  let is_enabled_for_chunk = is_enabled_for_chunk(
-    chunk_ukey,
-    &ChunkLoading::Enable(ChunkLoadingType::Jsonp),
-    compilation,
-  ) || is_enabled_for_chunk(
-    chunk_ukey,
-    &ChunkLoading::Enable(ChunkLoadingType::Import),
-    compilation,
-  );
+  let with_css = runtime_requirements.contains(RuntimeGlobals::HAS_CSS_MODULES);
+  let with_ensure_chunk = runtime_requirements.contains(RuntimeGlobals::ENSURE_CHUNK_HANDLERS);
+  let with_hmr = runtime_requirements.contains(RuntimeGlobals::HMR_DOWNLOAD_UPDATE_HANDLERS);
 
-  if !is_enabled_for_chunk {
-    return Ok(None);
-  }
+  if with_css || with_ensure_chunk || with_hmr {
+    let is_enabled_for_chunk = is_enabled_for_chunk(
+      chunk_ukey,
+      &ChunkLoading::Enable(ChunkLoadingType::Jsonp),
+      compilation,
+    ) || is_enabled_for_chunk(
+      chunk_ukey,
+      &ChunkLoading::Enable(ChunkLoadingType::Import),
+      compilation,
+    );
 
-  if runtime_requirements.contains(RuntimeGlobals::HAS_CSS_MODULES) {
-    if self.once_for_chunk_set.contains(chunk_ukey) {
-      return Ok(None);
-    }
-    self.once_for_chunk_set.insert(chunk_ukey.to_owned());
-    runtime_requirements_mut.insert(RuntimeGlobals::MODULE_FACTORIES_ADD_ONLY);
-    runtime_requirements_mut.insert(RuntimeGlobals::MAKE_NAMESPACE_OBJECT);
-    compilation.add_runtime_module(chunk_ukey, Box::<CssLoadingRuntimeModule>::default())?;
-    return Ok(None);
-  }
-
-  if runtime_requirements.contains(RuntimeGlobals::ENSURE_CHUNK_HANDLERS)
-    || runtime_requirements.contains(RuntimeGlobals::HMR_DOWNLOAD_UPDATE_HANDLERS)
-  {
-    let has_css_module_in_graph =
-      compilation
-        .chunk_graph
-        .has_module_in_graph(chunk_ukey, compilation, |module| {
-          module.module_type().is_css_like()
-        });
-
-    if !has_css_module_in_graph {
+    if !is_enabled_for_chunk {
       return Ok(None);
     }
 
-    if runtime_requirements.contains(RuntimeGlobals::ENSURE_CHUNK_HANDLERS) {
-      runtime_requirements_mut.insert(RuntimeGlobals::HAS_OWN_PROPERTY);
-      runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
-      runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
-    }
-
-    if runtime_requirements.contains(RuntimeGlobals::HMR_DOWNLOAD_UPDATE_HANDLERS) {
-      runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
-      runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
+    if with_css && !self.once_for_chunk_set.contains(chunk_ukey) {
+      self.once_for_chunk_set.insert(chunk_ukey.to_owned());
       runtime_requirements_mut.insert(RuntimeGlobals::MODULE_FACTORIES_ADD_ONLY);
+      runtime_requirements_mut.insert(RuntimeGlobals::MAKE_NAMESPACE_OBJECT);
+      compilation.add_runtime_module(chunk_ukey, Box::<CssLoadingRuntimeModule>::default())?;
+    }
+
+    if with_ensure_chunk || with_hmr {
+      let has_css_module_in_graph =
+        compilation
+          .chunk_graph
+          .has_module_in_graph(chunk_ukey, compilation, |module| {
+            module.module_type().is_css_like()
+          });
+
+      if !has_css_module_in_graph {
+        return Ok(None);
+      }
+
+      if runtime_requirements.contains(RuntimeGlobals::ENSURE_CHUNK_HANDLERS) {
+        runtime_requirements_mut.insert(RuntimeGlobals::HAS_OWN_PROPERTY);
+        runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
+        runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
+      }
+
+      if runtime_requirements.contains(RuntimeGlobals::HMR_DOWNLOAD_UPDATE_HANDLERS) {
+        runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
+        runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
+        runtime_requirements_mut.insert(RuntimeGlobals::MODULE_FACTORIES_ADD_ONLY);
+      }
     }
   }
 
