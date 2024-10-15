@@ -3,7 +3,7 @@
 use hashlink::LinkedHashMap;
 use indexmap::IndexSet;
 use itertools::Itertools;
-use rspack_collections::Database;
+use rspack_collections::{Database, UkeySet};
 use rspack_collections::{IdentifierLinkedMap, IdentifierMap, IdentifierSet};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet};
 
@@ -865,20 +865,29 @@ impl ChunkGraph {
   ) -> bool {
     let module_graph = &compilation.get_module_graph();
     let chunk = compilation.chunk_by_ukey.expect_get(chunk_ukey);
-    let mut queue = chunk.groups.clone().into_iter().collect::<Vec<_>>();
+    let mut chunks_processed = UkeySet::default();
+    let mut visit_chunk_groups = chunk.groups.iter().collect::<UkeySet<_>>();
+    let mut queue = visit_chunk_groups.iter().cloned().collect::<Vec<_>>();
+
     while let Some(chunk_group_ukey) = queue.pop() {
       let chunk_group = compilation
         .chunk_group_by_ukey
         .expect_get(&chunk_group_ukey);
-      for c in chunk_group.chunks.iter() {
-        for module in self.get_chunk_modules(c, module_graph) {
-          if filter(module) {
-            return true;
+      for inner_chunk in chunk_group.chunks.iter() {
+        if !chunks_processed.contains(inner_chunk) {
+          chunks_processed.insert(inner_chunk.to_owned());
+          for module in self.get_chunk_modules(inner_chunk, module_graph) {
+            if filter(module) {
+              return true;
+            }
           }
         }
       }
       for child in chunk_group.children.iter() {
-        queue.push(child.to_owned());
+        if !visit_chunk_groups.contains(child) {
+          visit_chunk_groups.insert(child);
+          queue.push(child);
+        }
       }
     }
 
