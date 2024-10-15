@@ -867,12 +867,10 @@ impl ChunkGraph {
     let chunk = compilation.chunk_by_ukey.expect_get(chunk_ukey);
     let mut chunks_processed = UkeySet::default();
     let mut visit_chunk_groups = chunk.groups.iter().collect::<UkeySet<_>>();
-    let mut queue = visit_chunk_groups.iter().cloned().collect::<Vec<_>>();
+    let mut queue = visit_chunk_groups.iter().copied().collect::<Vec<_>>();
 
     while let Some(chunk_group_ukey) = queue.pop() {
-      let chunk_group = compilation
-        .chunk_group_by_ukey
-        .expect_get(&chunk_group_ukey);
+      let chunk_group = compilation.chunk_group_by_ukey.expect_get(chunk_group_ukey);
       for inner_chunk in chunk_group.chunks.iter() {
         if !chunks_processed.contains(inner_chunk) {
           chunks_processed.insert(inner_chunk.to_owned());
