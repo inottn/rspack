@@ -538,6 +538,7 @@ impl ChunkGraph {
 
     modules
   }
+
   pub fn disconnect_chunk(
     &mut self,
     chunk: &mut Chunk,
@@ -854,5 +855,33 @@ impl ChunkGraph {
         None
       })
       .unwrap_or(module.source_types().iter().copied().collect())
+  }
+
+  pub fn has_module_in_graph<F: Fn(&Box<dyn Module>) -> bool>(
+    &self,
+    chunk_ukey: &ChunkUkey,
+    compilation: &Compilation,
+    filter: F,
+  ) -> bool {
+    let module_graph = &compilation.get_module_graph();
+    let chunk = compilation.chunk_by_ukey.expect_get(chunk_ukey);
+    let mut queue = chunk.groups.clone().into_iter().collect::<Vec<_>>();
+    while let Some(chunk_group_ukey) = queue.pop() {
+      let chunk_group = compilation
+        .chunk_group_by_ukey
+        .expect_get(&chunk_group_ukey);
+      for c in chunk_group.chunks.iter() {
+        for module in self.get_chunk_modules(c, module_graph) {
+          if filter(module) {
+            return true;
+          }
+        }
+      }
+      for child in chunk_group.children.iter() {
+        queue.push(child.to_owned());
+      }
+    }
+
+    false
   }
 }

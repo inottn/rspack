@@ -2,14 +2,16 @@
 mod impl_plugin_for_css_plugin;
 use std::cmp::{self, Reverse};
 
-use rspack_collections::IdentifierSet;
+use rspack_collections::{IdentifierSet, UkeyDashSet};
 use rspack_core::{Chunk, ChunkGraph, Compilation, Module, ModuleGraph, SourceType};
 use rspack_core::{ChunkUkey, ModuleIdentifier};
 use rspack_hook::plugin;
 
 #[plugin]
 #[derive(Debug, Default)]
-pub struct CssPlugin;
+pub struct CssPlugin {
+  pub once_for_chunk_set: UkeyDashSet<ChunkUkey>,
+}
 
 #[derive(Debug)]
 pub struct CssOrderConflicts {
@@ -19,6 +21,10 @@ pub struct CssOrderConflicts {
 }
 
 impl CssPlugin {
+  pub fn new() -> Self {
+    Self::new_inner(Default::default())
+  }
+
   pub(crate) fn get_ordered_chunk_css_modules<'chunk_graph>(
     chunk: &Chunk,
     chunk_graph: &'chunk_graph ChunkGraph,

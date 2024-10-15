@@ -187,6 +187,14 @@ fn runtime_requirements_in_tree(
   runtime_requirements: &RuntimeGlobals,
   runtime_requirements_mut: &mut RuntimeGlobals,
 ) -> Result<Option<()>> {
+  if runtime_requirements.contains(RuntimeGlobals::HAS_CSS_MODULES) {
+    if self.once_for_chunk_set.contains(chunk_ukey) {
+      return Ok(None);
+    }
+
+    self.once_for_chunk_set.insert(chunk_ukey.to_owned());
+  }
+
   let is_enabled_for_chunk = is_enabled_for_chunk(
     chunk_ukey,
     &ChunkLoading::Enable(ChunkLoadingType::Jsonp),
@@ -197,17 +205,38 @@ fn runtime_requirements_in_tree(
     compilation,
   );
 
-  if (runtime_requirements.contains(RuntimeGlobals::HAS_CSS_MODULES)
-    || runtime_requirements.contains(RuntimeGlobals::ENSURE_CHUNK_HANDLERS)
-    || runtime_requirements.contains(RuntimeGlobals::HMR_DOWNLOAD_UPDATE_HANDLERS))
-    && is_enabled_for_chunk
-  {
-    runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
-    runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
-    runtime_requirements_mut.insert(RuntimeGlobals::HAS_OWN_PROPERTY);
+  if !is_enabled_for_chunk {
+    return Ok(None);
+  }
+
+  if runtime_requirements.contains(RuntimeGlobals::HAS_CSS_MODULES) {
     runtime_requirements_mut.insert(RuntimeGlobals::MODULE_FACTORIES_ADD_ONLY);
     runtime_requirements_mut.insert(RuntimeGlobals::MAKE_NAMESPACE_OBJECT);
     compilation.add_runtime_module(chunk_ukey, Box::<CssLoadingRuntimeModule>::default())?;
+    return Ok(None);
+  }
+
+  let has_css_module_in_graph =
+    compilation
+      .chunk_graph
+      .has_module_in_graph(chunk_ukey, compilation, |module| {
+        module.module_type().is_css_like()
+      });
+
+  if !has_css_module_in_graph {
+    return Ok(None);
+  }
+
+  if runtime_requirements.contains(RuntimeGlobals::ENSURE_CHUNK_HANDLERS) {
+    runtime_requirements_mut.insert(RuntimeGlobals::HAS_OWN_PROPERTY);
+    runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
+    runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
+  }
+
+  if runtime_requirements.contains(RuntimeGlobals::HMR_DOWNLOAD_UPDATE_HANDLERS) {
+    runtime_requirements_mut.insert(RuntimeGlobals::PUBLIC_PATH);
+    runtime_requirements_mut.insert(RuntimeGlobals::GET_CHUNK_CSS_FILENAME);
+    runtime_requirements_mut.insert(RuntimeGlobals::MODULE_FACTORIES_ADD_ONLY);
   }
 
   Ok(None)
