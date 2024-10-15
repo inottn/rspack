@@ -85,10 +85,10 @@ Rspack x.x.x compiled successfully in X s"
 `;
 
 exports[`statsOutput statsOutput/css-concat should print correct stats for 1`] = `
-"asset main.js 7.81 KiB [emitted] (name: main)
+"asset main.js 5.62 KiB [emitted] (name: main)
 asset main.css 51 bytes [emitted] (name: main)
-Entrypoint main 7.86 KiB = main.js 7.81 KiB main.css 51 bytes
-runtime modules 6.47 KiB 6 modules
+Entrypoint main 5.67 KiB = main.js 5.62 KiB main.css 51 bytes
+runtime modules 4.48 KiB 2 modules
 cacheable modules 20 bytes (javascript) 23 bytes (css)
   ./index.js 20 bytes [built] [code generated]
   ./foo.css 23 bytes [built] [code generated]
@@ -96,9 +96,9 @@ Rspack x.x.x compiled successfully in X s"
 `;
 
 exports[`statsOutput statsOutput/filename should print correct stats for 1`] = `
-"asset 909.xxxx.js 9.14 KiB [emitted] (name: main)
+"asset 909.xxxx.js 8.81 KiB [emitted] (name: main)
 asset 521.xxxx.js 337 bytes [emitted]
-runtime modules 7.54 KiB 11 modules
+runtime modules 7.27 KiB 9 modules
 cacheable modules 70 bytes
   ./index.js 38 bytes [built] [code generated]
   ./dynamic.js 32 bytes [built] [code generated]
@@ -106,8 +106,8 @@ Rspack x.x.x compiled successfully in X s"
 `;
 
 exports[`statsOutput statsOutput/hot+production should print correct stats for 1`] = `
-"asset main.js 35.5 KiB [emitted] (name: main)
-runtime modules 33.1 KiB 12 modules
+"asset main.js 28.2 KiB [emitted] (name: main)
+runtime modules 26 KiB 9 modules
 ./index.js 25 bytes [built] [code generated]
 Rspack x.x.x compiled successfully in X s"
 `;
@@ -149,18 +149,18 @@ exports[`statsOutput statsOutput/limit-chunk-count-plugin should print correct s
   1 chunks (Rspack x.x.x) compiled successfully in X s
 
 2 chunks:
-  asset bundle2.js 10.5 KiB [emitted] (name: main)
+  asset bundle2.js 10.2 KiB [emitted] (name: main)
   asset 76.bundle2.js 497 bytes [emitted] (name: c)
   chunk (runtime: main) 76.bundle2.js (c) 74 bytes <{76}> <{909}> >{76}< [rendered]
     dependent modules 44 bytes [dependent] 2 modules
     ./c.js 30 bytes [built] [code generated]
-  chunk (runtime: main) bundle2.js (main) 145 bytes (javascript) 8.73 KiB (runtime) >{76}< [entry] [rendered]
+  chunk (runtime: main) bundle2.js (main) 145 bytes (javascript) 8.45 KiB (runtime) >{76}< [entry] [rendered]
     dependent modules 22 bytes [dependent] 1 module
     ./index.js 123 bytes [built] [code generated]
   2 chunks (Rspack x.x.x) compiled successfully in X s
 
 3 chunks:
-  asset bundle3.js 10.5 KiB [emitted] (name: main)
+  asset bundle3.js 10.2 KiB [emitted] (name: main)
   asset 76.bundle3.js 387 bytes [emitted] (name: c)
   asset 345.bundle3.js 186 bytes [emitted]
   chunk (runtime: main) 345.bundle3.js 44 bytes <{76}> [rendered]
@@ -168,13 +168,13 @@ exports[`statsOutput statsOutput/limit-chunk-count-plugin should print correct s
     ./e.js 22 bytes [built] [code generated]
   chunk (runtime: main) 76.bundle3.js (c) 30 bytes <{909}> >{345}< [rendered]
     ./c.js 30 bytes [built] [code generated]
-  chunk (runtime: main) bundle3.js (main) 145 bytes (javascript) 8.73 KiB (runtime) >{76}< [entry] [rendered]
+  chunk (runtime: main) bundle3.js (main) 145 bytes (javascript) 8.45 KiB (runtime) >{76}< [entry] [rendered]
     dependent modules 22 bytes [dependent] 1 module
     ./index.js 123 bytes [built] [code generated]
   3 chunks (Rspack x.x.x) compiled successfully in X s
 
 4 chunks:
-  asset bundle4.js 10.5 KiB [emitted] (name: main)
+  asset bundle4.js 10.2 KiB [emitted] (name: main)
   asset 76.bundle4.js 387 bytes [emitted] (name: c)
   asset 697.bundle4.js 130 bytes [emitted]
   asset 753.bundle4.js 130 bytes [emitted]
@@ -184,7 +184,7 @@ exports[`statsOutput statsOutput/limit-chunk-count-plugin should print correct s
     ./d.js 22 bytes [built] [code generated]
   chunk (runtime: main) 76.bundle4.js (c) 30 bytes <{909}> >{697}< >{753}< [rendered]
     ./c.js 30 bytes [built] [code generated]
-  chunk (runtime: main) bundle4.js (main) 145 bytes (javascript) 8.73 KiB (runtime) >{76}< [entry] [rendered]
+  chunk (runtime: main) bundle4.js (main) 145 bytes (javascript) 8.45 KiB (runtime) >{76}< [entry] [rendered]
     dependent modules 22 bytes [dependent] 1 module
     ./index.js 123 bytes [built] [code generated]
   4 chunks (Rspack x.x.x) compiled successfully in X s"
@@ -218,7 +218,7 @@ Rspack compiled with 1 error"
 `;
 
 exports[`statsOutput statsOutput/named-chunk-group should print correct stats for 1`] = `
-"Entrypoint main 9.13 KiB = main.js
+"Entrypoint main 8.8 KiB = main.js
 Chunk Group cimanyd 337 bytes = cimanyd.js"
 `;
 
@@ -234,13 +234,13 @@ Rspack compiled with 1 error"
 `;
 
 exports[`statsOutput statsOutput/optimization-chunk-ids-natural should print correct stats for 1`] = `
-"Entrypoint e1 10.7 KiB = e1.js
-Entrypoint e2 10.6 KiB = e2.js
+"Entrypoint e1 10.4 KiB = e1.js
+Entrypoint e2 10.3 KiB = e2.js
 chunk (runtime: e1) 0.js 24 bytes [rendered]
 chunk (runtime: e1) 1.js 52 bytes [rendered]
 chunk (runtime: e1, e2) 2.js 22 bytes [rendered]
-chunk (runtime: e1) e1.js (e1) 74 bytes (javascript) 8.72 KiB (runtime) [entry] [rendered]
-chunk (runtime: e2) e2.js (e2) 51 bytes (javascript) 8.72 KiB (runtime) [entry] [rendered]"
+chunk (runtime: e1) e1.js (e1) 74 bytes (javascript) 8.44 KiB (runtime) [entry] [rendered]
+chunk (runtime: e2) e2.js (e2) 51 bytes (javascript) 8.44 KiB (runtime) [entry] [rendered]"
 `;
 
 exports[`statsOutput statsOutput/optimization-runtime-chunk should print correct stats for 1`] = `
@@ -298,11 +298,11 @@ Rspack compiled with 1 error"
 `;
 
 exports[`statsOutput statsOutput/performance-disabled should print correct stats for 1`] = `
-"asset main.js 304 KiB [emitted] (name: main)
+"asset main.js 303 KiB [emitted] (name: main)
 asset 697.js 130 bytes [emitted]
 asset 753.js 130 bytes [emitted]
-Entrypoint main 304 KiB = main.js
-runtime modules 8.72 KiB 12 modules
+Entrypoint main 303 KiB = main.js
+runtime modules 8.44 KiB 10 modules
 cacheable modules 293 KiB
   ./index.js 49 bytes [built] [code generated]
   ./a.js 293 KiB [built] [code generated]
@@ -314,11 +314,11 @@ Rspack x.x.x compiled successfully in X s"
 `;
 
 exports[`statsOutput statsOutput/performance-error should print correct stats for 1`] = `
-"asset main.js 304 KiB [emitted] [big] (name: main)
+"asset main.js 303 KiB [emitted] [big] (name: main)
 asset 697.js 130 bytes [emitted]
 asset 753.js 130 bytes [emitted]
-Entrypoint main [big] 304 KiB = main.js
-runtime modules 8.72 KiB 12 modules
+Entrypoint main [big] 303 KiB = main.js
+runtime modules 8.44 KiB 10 modules
 cacheable modules 293 KiB
   ./index.js 48 bytes [built] [code generated]
   ./a.js 293 KiB [built] [code generated]
@@ -328,11 +328,11 @@ cacheable modules 293 KiB
   ./e.js 22 bytes [built] [code generated]
 
 ERROR in × asset size limit: The following asset(s) exceed the recommended size limit (244.141 KiB). This can impact web performance.Assets:
-  │   main.js (303.692 KiB)
+  │   main.js (303.362 KiB)
 
 
 ERROR in × entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244.141 KiB). This can impact web performance.Entrypoints:
-  │   main (303.692 KiB)
+  │   main (303.362 KiB)
   │       main.js
 
 
@@ -340,11 +340,11 @@ Rspack x.x.x compiled with 2 errors in X s"
 `;
 
 exports[`statsOutput statsOutput/performance-no-hints should print correct stats for 1`] = `
-"asset main.js 304 KiB [emitted] [big] (name: main)
+"asset main.js 303 KiB [emitted] [big] (name: main)
 asset 697.js 130 bytes [emitted]
 asset 753.js 130 bytes [emitted]
-Entrypoint main [big] 304 KiB = main.js
-runtime modules 8.72 KiB 12 modules
+Entrypoint main [big] 303 KiB = main.js
+runtime modules 8.44 KiB 10 modules
 cacheable modules 293 KiB
   ./index.js 48 bytes [built] [code generated]
   ./a.js 293 KiB [built] [code generated]
@@ -366,7 +366,7 @@ chunk (runtime: main) a2.js (a2) 1 bytes <{74}> [rendered]
 chunk (runtime: main) b.js (b) 203 bytes <{909}> >{438}< >{439}< >{826}< (prefetch: {826} {438}) (preload: {439}) [rendered]
 chunk (runtime: main) c.js (c) 134 bytes <{909}> >{380}< >{433}< (preload: {433} {380}) [rendered]
 chunk (runtime: main) b1.js (b1) 1 bytes <{751}> [rendered]
-chunk (runtime: main) main.js (main) 195 bytes (javascript) 12 KiB (runtime) >{74}< >{751}< >{76}< (prefetch: {74} {751} {76}) [entry] [rendered]"
+chunk (runtime: main) main.js (main) 195 bytes (javascript) 11.7 KiB (runtime) >{74}< >{751}< >{76}< (prefetch: {74} {751} {76}) [entry] [rendered]"
 `;
 
 exports[`statsOutput statsOutput/reasons should print correct stats for 1`] = `

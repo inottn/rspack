@@ -175,6 +175,7 @@ async fn compilation(
     DependencyType::CssCompose,
     params.normal_module_factory.clone(),
   );
+  self.once_for_chunk_set.clear();
   Ok(())
 }
 

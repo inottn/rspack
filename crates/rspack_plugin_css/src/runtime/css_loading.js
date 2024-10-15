@@ -19,13 +19,13 @@ var loadStylesheet = function (chunkId, url, done, hmr, fetchPriority) {
 		for (var i = 0; i < links.length; i++) {
 			var l = links[i];
 			var href = l.getAttribute("href") || l.href;
-			if (href && !href.startsWith(__webpack_require__.p)) {
-				href =
-					__webpack_require__.p + (href.startsWith("/") ? href.slice(1) : href);
-			}
+			// if (href && !href.startsWith(__webpack_require__.p)) {
+			// 	href =
+			// 		__webpack_require__.p + (href.startsWith("/") ? href.slice(1) : href);
+			// }
 			if (
 				l.rel == "stylesheet" &&
-				((href && href.startsWith(url)) ||
+				(l.href == url || l.getAttribute("href") == url ||
 					l.getAttribute("data-webpack") == uniqueName + ":" + key)
 			) {
 				link = l;
