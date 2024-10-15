@@ -85,10 +85,10 @@ Rspack x.x.x compiled successfully in X s"
 `;
 
 exports[`statsOutput statsOutput/css-concat should print correct stats for 1`] = `
-"asset main.js 5.62 KiB [emitted] (name: main)
+"asset main.js 5.65 KiB [emitted] (name: main)
 asset main.css 51 bytes [emitted] (name: main)
-Entrypoint main 5.67 KiB = main.js 5.62 KiB main.css 51 bytes
-runtime modules 4.48 KiB 2 modules
+Entrypoint main 5.7 KiB = main.js 5.65 KiB main.css 51 bytes
+runtime modules 4.51 KiB 2 modules
 cacheable modules 20 bytes (javascript) 23 bytes (css)
   ./index.js 20 bytes [built] [code generated]
   ./foo.css 23 bytes [built] [code generated]

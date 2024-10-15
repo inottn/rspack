@@ -6,9 +6,6 @@ module.exports = {
 	output: {
 		publicPath: '/'
 	},
-	experiments: {
-		css: true,
-	},
 	module: {
 		rules: [
 			{
