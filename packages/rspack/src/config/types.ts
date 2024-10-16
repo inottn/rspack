@@ -1066,12 +1066,12 @@ export type Optimization = {
 	/**
 	 * Which algorithm to use when choosing module ids.
 	 */
-	moduleIds?: "named" | "natural" | "deterministic";
+	moduleIds?: "named" | "natural" | "deterministic" | "size";
 
 	/**
 	 * Which algorithm to use when choosing chunk ids.
 	 */
-	chunkIds?: "natural" | "named" | "deterministic";
+	chunkIds?: "natural" | "named" | "deterministic" | "size" | "total-size";
 
 	/**
 	 * Whether to minimize the bundle.

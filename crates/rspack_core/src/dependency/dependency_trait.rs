@@ -109,6 +109,10 @@ pub trait Dependency:
   }
 
   fn could_affect_referencing_module(&self) -> AffectType;
+
+  fn get_number_of_id_occurrences(&self) -> usize {
+    1
+  }
 }
 
 impl dyn Dependency + '_ {

@@ -3,6 +3,7 @@ mod raw_bundle_info;
 mod raw_copy;
 mod raw_css_extract;
 mod raw_html;
+mod raw_ids;
 mod raw_ignore;
 mod raw_lazy_compilation;
 mod raw_lightning_css_minimizer;
@@ -15,13 +16,15 @@ mod raw_swc_js_minimizer;
 
 use napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown};
 use napi_derive::napi;
+use raw_ids::{RawOccurrenceChunkIdsPluginOptions, RawOccurrenceModuleIdsPluginOptions};
 use raw_lightning_css_minimizer::RawLightningCssMinimizerRspackPluginOptions;
 use rspack_binding_values::entry::JsEntryPluginOptions;
 use rspack_core::{BoxPlugin, Plugin, PluginExt};
 use rspack_error::Result;
 use rspack_ids::{
   DeterministicChunkIdsPlugin, DeterministicModuleIdsPlugin, NamedChunkIdsPlugin,
-  NamedModuleIdsPlugin, NaturalChunkIdsPlugin, NaturalModuleIdsPlugin,
+  NamedModuleIdsPlugin, NaturalChunkIdsPlugin, NaturalModuleIdsPlugin, OccurrenceChunkIdsPlugin,
+  OccurrenceModuleIdsPlugin,
 };
 use rspack_napi::NapiResultExt;
 use rspack_plugin_asset::AssetPlugin;
@@ -135,9 +138,11 @@ pub enum BuiltinPluginName {
   NamedModuleIdsPlugin,
   NaturalModuleIdsPlugin,
   DeterministicModuleIdsPlugin,
+  OccurrenceModuleIdsPlugin,
   NaturalChunkIdsPlugin,
   NamedChunkIdsPlugin,
   DeterministicChunkIdsPlugin,
+  OccurrenceChunkIdsPlugin,
   RealContentHashPlugin,
   RemoveEmptyChunksPlugin,
   EnsureChunkConditionsPlugin,
@@ -343,6 +348,12 @@ impl BuiltinPlugin {
       BuiltinPluginName::DeterministicModuleIdsPlugin => {
         plugins.push(DeterministicModuleIdsPlugin::default().boxed())
       }
+      BuiltinPluginName::OccurrenceModuleIdsPlugin => plugins.push(
+        OccurrenceModuleIdsPlugin::new(
+          downcast_into::<RawOccurrenceModuleIdsPluginOptions>(self.options)?.into(),
+        )
+        .boxed(),
+      ),
       BuiltinPluginName::NaturalChunkIdsPlugin => {
         plugins.push(NaturalChunkIdsPlugin::default().boxed())
       }
@@ -352,6 +363,12 @@ impl BuiltinPlugin {
       BuiltinPluginName::DeterministicChunkIdsPlugin => {
         plugins.push(DeterministicChunkIdsPlugin::default().boxed())
       }
+      BuiltinPluginName::OccurrenceChunkIdsPlugin => plugins.push(
+        OccurrenceChunkIdsPlugin::new(
+          downcast_into::<RawOccurrenceChunkIdsPluginOptions>(self.options)?.into(),
+        )
+        .boxed(),
+      ),
       BuiltinPluginName::RealContentHashPlugin => {
         plugins.push(RealContentHashPlugin::default().boxed())
       }

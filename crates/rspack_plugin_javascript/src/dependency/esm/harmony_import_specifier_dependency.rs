@@ -337,6 +337,10 @@ impl Dependency for HarmonyImportSpecifierDependency {
   fn could_affect_referencing_module(&self) -> rspack_core::AffectType {
     rspack_core::AffectType::True
   }
+
+  fn get_number_of_id_occurrences(&self) -> usize {
+    0
+  }
 }
 
 impl ModuleDependency for HarmonyImportSpecifierDependency {

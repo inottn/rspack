@@ -411,6 +411,10 @@ impl Chunk {
     self.groups.contains(chunk_group)
   }
 
+  pub fn get_number_of_groups(&self) -> usize {
+    self.groups.len()
+  }
+
   pub fn disconnect_from_groups(&mut self, chunk_group_by_ukey: &mut ChunkGroupByUkey) {
     for group_ukey in self.groups.iter() {
       let group = chunk_group_by_ukey.expect_get_mut(group_ukey);

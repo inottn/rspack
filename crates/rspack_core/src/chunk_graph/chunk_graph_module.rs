@@ -42,6 +42,17 @@ impl ChunkGraph {
       .or_default();
   }
 
+  pub fn is_entry_module_in_chunk(
+    &self,
+    module_identifier: &ModuleIdentifier,
+    chunk_ukey: ChunkUkey,
+  ) -> bool {
+    let chunk_graph_chunk = self.get_chunk_graph_chunk(&chunk_ukey);
+    chunk_graph_chunk
+      .entry_modules
+      .contains_key(module_identifier)
+  }
+
   pub fn is_module_in_chunk(
     &self,
     module_identifier: &ModuleIdentifier,
