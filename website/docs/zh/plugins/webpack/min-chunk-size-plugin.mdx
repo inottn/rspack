@@ -1,0 +1,27 @@
+import WebpackLicense from '@components/WebpackLicense';
+
+<WebpackLicense from="https://webpack.docschina.org/plugins/min-chunk-size-plugin/" />
+
+# MinChunkSizePlugin
+
+当你在应用中引入代码分割点时，可能会生成一些非常小的 chunk。`MinChunkSizePlugin` 可以帮助确保生成的 chunk 不会小于指定的大小阈值。它通过将小于最小大小的 chunk 合并到其他 chunk 中来优化输出。
+
+```js
+new rspack.optimize.MinChunkSizePlugin({
+  // 选项...
+});
+```
+
+## 选项
+
+### minChunkSize
+
+- **类型：** `number`
+
+指定 chunk 的最小大小（以字节为单位）。小于该大小的 chunk 将尝试与其他 chunk 合并。
+
+```js
+new rspack.optimize.MinChunkSizePlugin({
+  minChunkSize: 10000,
+});
+```

@@ -1,0 +1,27 @@
+import WebpackLicense from '@components/WebpackLicense';
+
+<WebpackLicense from="https://webpack.js.org/plugins/min-chunk-size-plugin/" />
+
+# MinChunkSizePlugin
+
+When adding code-splitting points in your application, you may end up with very small chunks. The `MinChunkSizePlugin` helps ensure that generated chunks are not smaller than a specified size threshold. It optimizes the output by merging chunks smaller than the minimum size into other chunks.
+
+```js
+new rspack.optimize.MinChunkSizePlugin({
+  // Options...
+});
+```
+
+## Options
+
+### minChunkSize
+
+- **Type:** `number`
+
+Specifies the minimum chunk size (in bytes). Chunks smaller than this size will attempt to merge with other chunks.
+
+```js
+new rspack.optimize.MinChunkSizePlugin({
+  minChunkSize: 10000,
+});
+```

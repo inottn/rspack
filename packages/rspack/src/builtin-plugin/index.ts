@@ -40,6 +40,7 @@ export * from "./lazy-compilation/plugin";
 export * from "./LimitChunkCountPlugin";
 export * from "./MangleExportsPlugin";
 export * from "./MergeDuplicateChunksPlugin";
+export * from "./MinChunkSizePlugin";
 export * from "./ModuleChunkFormatPlugin";
 export * from "./ModuleConcatenationPlugin";
 export * from "./NamedChunkIdsPlugin";

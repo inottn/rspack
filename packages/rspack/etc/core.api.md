@@ -61,6 +61,7 @@ import { RawCopyPattern } from '@rspack/binding';
 import { RawCssExtractPluginOption } from '@rspack/binding';
 import type { RawFuncUseCtx } from '@rspack/binding';
 import { RawIgnorePluginOptions } from '@rspack/binding';
+import { RawMinChunkSizePluginOptions } from '@rspack/binding';
 import { RawOptions } from '@rspack/binding';
 import { RawProgressPluginOptions } from '@rspack/binding';
 import { RawProvideOptions } from '@rspack/binding';
@@ -3451,6 +3452,17 @@ const matchObject: (obj: MatchObject, str: string) => boolean;
 // @public (undocumented)
 const matchPart: (str: string, test: Matcher) => boolean;
 
+// @public (undocumented)
+const MinChunkSizePlugin: {
+    new (options: RawMinChunkSizePluginOptions): {
+        name: BuiltinPluginName;
+        _args: [options: RawMinChunkSizePluginOptions];
+        affectedHooks: "done" | "make" | "compile" | "emit" | "afterEmit" | "invalid" | "thisCompilation" | "afterDone" | "compilation" | "normalModuleFactory" | "contextModuleFactory" | "initialize" | "shouldEmit" | "infrastructureLog" | "beforeRun" | "run" | "assetEmitted" | "failed" | "shutdown" | "watchRun" | "watchClose" | "environment" | "afterEnvironment" | "afterPlugins" | "afterResolvers" | "beforeCompile" | "afterCompile" | "finishMake" | "entryOption" | undefined;
+        raw(compiler: Compiler_2): BuiltinPlugin;
+        apply(compiler: Compiler_2): void;
+    };
+};
+
 // @public
 export type Mode = "development" | "production" | "none";
 
@@ -3956,6 +3968,8 @@ type OptimizationSplitChunksSizes = number | Record<string, number>;
 interface Optimize {
     // (undocumented)
     LimitChunkCountPlugin: typeof LimitChunkCountPlugin;
+    // (undocumented)
+    MinChunkSizePlugin: typeof MinChunkSizePlugin;
     // (undocumented)
     RuntimeChunkPlugin: typeof RuntimeChunkPlugin;
     // (undocumented)

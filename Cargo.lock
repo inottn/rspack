@@ -3520,6 +3520,7 @@ dependencies = [
  "rspack_plugin_limit_chunk_count",
  "rspack_plugin_merge_duplicate_chunks",
  "rspack_plugin_mf",
+ "rspack_plugin_min_chunk_size",
  "rspack_plugin_no_emit_on_errors",
  "rspack_plugin_progress",
  "rspack_plugin_real_content_hash",
@@ -4336,6 +4337,17 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "rspack_plugin_min_chunk_size"
+version = "0.1.0"
+dependencies = [
+ "rspack_collections",
+ "rspack_core",
+ "rspack_error",
+ "rspack_hook",
  "tracing",
 ]
 
