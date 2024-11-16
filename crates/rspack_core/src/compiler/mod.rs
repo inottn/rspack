@@ -36,6 +36,7 @@ define_hook!(CompilerShouldEmit: AsyncSeriesBail(compilation: &mut Compilation) 
 define_hook!(CompilerEmit: AsyncSeries(compilation: &mut Compilation));
 define_hook!(CompilerAfterEmit: AsyncSeries(compilation: &mut Compilation));
 define_hook!(CompilerAssetEmitted: AsyncSeries(compilation: &Compilation, filename: &str, info: &AssetEmittedInfo));
+define_hook!(CompilerWatchClose: SyncSeries());
 
 #[derive(Debug, Default)]
 pub struct CompilerHooks {
@@ -47,6 +48,7 @@ pub struct CompilerHooks {
   pub emit: CompilerEmitHook,
   pub after_emit: CompilerAfterEmitHook,
   pub asset_emitted: CompilerAssetEmittedHook,
+  pub watch_close: CompilerWatchCloseHook,
 }
 
 #[derive(Debug)]
@@ -412,6 +414,10 @@ impl Compiler {
         .await?;
     }
     Ok(())
+  }
+
+  pub fn watch_close(&self) -> Result<()> {
+    self.plugin_driver.compiler_hooks.watch_close.call()
   }
 
   fn new_compilation_params(&self) -> CompilationParams {

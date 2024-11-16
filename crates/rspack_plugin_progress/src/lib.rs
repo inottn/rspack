@@ -14,8 +14,8 @@ use rspack_core::{
   CompilationOptimizeChunks, CompilationOptimizeDependencies, CompilationOptimizeModules,
   CompilationOptimizeTree, CompilationParams, CompilationProcessAssets, CompilationSeal,
   CompilationSucceedModule, CompilerAfterEmit, CompilerCompilation, CompilerEmit,
-  CompilerFinishMake, CompilerMake, CompilerOptions, CompilerThisCompilation, ModuleIdentifier,
-  Plugin, PluginContext,
+  CompilerFinishMake, CompilerMake, CompilerOptions, CompilerThisCompilation, CompilerWatchClose,
+  ModuleIdentifier, Plugin, PluginContext,
 };
 use rspack_error::Result;
 use rspack_hook::{plugin, plugin_hook};
@@ -473,6 +473,14 @@ async fn after_emit(&self, _compilation: &mut Compilation) -> Result<()> {
   )
 }
 
+#[plugin_hook(CompilerWatchClose for ProgressPlugin)]
+fn watch_close(&self) -> Result<()> {
+  if let Some(progress_bar) = &self.progress_bar {
+    progress_bar.finish_and_clear();
+  }
+  Ok(())
+}
+
 #[async_trait]
 impl Plugin for ProgressPlugin {
   fn name(&self) -> &'static str {
@@ -568,6 +576,11 @@ impl Plugin for ProgressPlugin {
       .compiler_hooks
       .after_emit
       .tap(after_emit::new(self));
+    ctx
+      .context
+      .compiler_hooks
+      .watch_close
+      .tap(watch_close::new(self));
     Ok(())
   }
 }

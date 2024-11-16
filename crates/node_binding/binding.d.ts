@@ -205,6 +205,7 @@ export declare class Rspack {
   build(callback: (err: null | Error) => void): void
   /** Rebuild with the given option passed to the constructor */
   rebuild(changed_files: string[], removed_files: string[], callback: (err: null | Error) => void): void
+  watchClose(): void
 }
 
 export declare function __chunk_graph_inner_get_chunk_entry_dependent_chunks_iterable(jsChunkUkey: number, jsCompilation: JsCompilation): Array<JsChunk>

@@ -147,6 +147,14 @@ impl Rspack {
       })
     }
   }
+
+  #[napi]
+  pub fn watch_close(&self) -> Result<()> {
+    self
+      .compiler
+      .watch_close()
+      .map_err(|e| Error::from_reason(format!("{e}")))
+  }
 }
 
 impl Rspack {
