@@ -7,11 +7,11 @@ use rayon::prelude::*;
 use rspack_core::{
   rspack_sources::{BoxSource, RawSource, SourceExt},
   AssetGeneratorDataUrl, AssetGeneratorDataUrlFnArgs, AssetInfo, AssetParserDataUrl,
-  BuildMetaDefaultObject, BuildMetaExportsType, ChunkGraph, ChunkUkey, CodeGenerationDataAssetInfo,
-  CodeGenerationDataFilename, CodeGenerationDataUrl, Compilation, CompilationRenderManifest,
-  CompilerOptions, Filename, GenerateContext, GeneratorOptions, LocalFilenameFn, Module,
-  ModuleGraph, NormalModule, ParseContext, ParserAndGenerator, PathData, Plugin, PublicPath,
-  RenderManifestEntry, ResourceData, RuntimeGlobals, RuntimeSpec, SourceType,
+  AssetParserDataUrlFnCtx, BuildMetaDefaultObject, BuildMetaExportsType, ChunkGraph, ChunkUkey,
+  CodeGenerationDataAssetInfo, CodeGenerationDataFilename, CodeGenerationDataUrl, Compilation,
+  CompilationRenderManifest, CompilerOptions, Filename, GenerateContext, GeneratorOptions,
+  LocalFilenameFn, Module, ModuleGraph, NormalModule, ParseContext, ParserAndGenerator, PathData,
+  Plugin, PublicPath, RenderManifestEntry, ResourceData, RuntimeGlobals, RuntimeSpec, SourceType,
   NAMESPACE_OBJECT_EXPORT,
 };
 use rspack_error::{error, Diagnostic, IntoTWithDiagnosticArray, Result};
@@ -320,6 +320,8 @@ impl ParserAndGenerator for AssetParserAndGenerator {
       source,
       build_meta,
       build_info,
+      match_resource,
+      resource_data,
       ..
     } = parse_context;
     build_info.strict = true;
@@ -331,24 +333,25 @@ impl ParserAndGenerator for AssetParserAndGenerator {
       DataUrlOptions::Source => Some(CanonicalizedDataUrlOption::Source),
       DataUrlOptions::Inline(val) => Some(CanonicalizedDataUrlOption::Asset(*val)),
       DataUrlOptions::Auto(option) => {
-        let limit_size = parse_context
+        let data_url_condition = parse_context
           .module_parser_options
-          .and_then(|x| {
-            x.get_asset()
-              .and_then(|x| x.data_url_condition.as_ref())
-              .and_then(|x| match x {
-                AssetParserDataUrl::Options(x) => x.max_size,
-              })
-          })
-          .or_else(|| {
-            option.as_ref().and_then(|x| match x {
-              AssetParserDataUrl::Options(x) => x.max_size,
-            })
-          })
-          .unwrap_or(DEFAULT_MAX_SIZE);
-        Some(CanonicalizedDataUrlOption::Asset(
-          size <= limit_size as usize,
-        ))
+          .and_then(|x| x.get_asset().and_then(|x| x.data_url_condition.as_ref()))
+          .or(option.as_ref());
+        let condition = match data_url_condition {
+          Some(AssetParserDataUrl::Func(func)) => func(
+            source.buffer().to_vec(),
+            AssetParserDataUrlFnCtx {
+              filename: match_resource.unwrap_or(resource_data).resource.clone(),
+            },
+          )?,
+          Some(AssetParserDataUrl::Options(options)) => {
+            let limit_size = options.max_size.unwrap_or(DEFAULT_MAX_SIZE);
+            size <= limit_size as usize
+          }
+          None => size <= DEFAULT_MAX_SIZE as usize,
+        };
+
+        Some(CanonicalizedDataUrlOption::Asset(condition))
       }
     };
 

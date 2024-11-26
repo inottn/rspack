@@ -1091,9 +1091,8 @@ export interface RawAssetInlineGeneratorOptions {
   dataUrl?: RawAssetGeneratorDataUrlOptions | ((arg: RawAssetGeneratorDataUrlFnArgs) => string)
 }
 
-export interface RawAssetParserDataUrl {
-  type: "options"
-  options?: RawAssetParserDataUrlOptions
+export interface RawAssetParserDataUrlFnCtx {
+  filename: string
 }
 
 export interface RawAssetParserDataUrlOptions {
@@ -1101,7 +1100,7 @@ export interface RawAssetParserDataUrlOptions {
 }
 
 export interface RawAssetParserOptions {
-  dataUrlCondition?: RawAssetParserDataUrl
+  dataUrlCondition?: RawAssetParserDataUrlOptions | ((source: Buffer, context: RawAssetParserDataUrlFnCtx) => string)
 }
 
 export interface RawAssetResourceGeneratorOptions {

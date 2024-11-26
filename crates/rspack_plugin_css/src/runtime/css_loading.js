@@ -69,4 +69,3 @@ var loadStylesheet = function (chunkId, url, done, hmr, fetchPriority) {
 	hmr ? document.head.insertBefore(link, hmr) : needAttach && document.head.appendChild(link);
 	return link;
 };
-__INITIAL_CSS_CHUNK_DATA__

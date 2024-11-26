@@ -4,7 +4,6 @@ import {
 	type JsLibraryOptions,
 	type RawAssetGeneratorOptions,
 	type RawAssetInlineGeneratorOptions,
-	type RawAssetParserDataUrl,
 	type RawAssetParserOptions,
 	type RawAssetResourceGeneratorOptions,
 	type RawCssAutoGeneratorOptions,
@@ -705,16 +704,14 @@ function getRawAssetParserOptions(
 	};
 }
 
-function getRawAssetParserDataUrl(
-	dataUrlCondition: AssetParserDataUrl
-): RawAssetParserDataUrl {
+function getRawAssetParserDataUrl(dataUrlCondition: AssetParserDataUrl) {
 	if (typeof dataUrlCondition === "object" && dataUrlCondition !== null) {
 		return {
-			type: "options",
-			options: {
-				maxSize: dataUrlCondition.maxSize
-			}
+			maxSize: dataUrlCondition.maxSize
 		};
+	}
+	if (typeof dataUrlCondition === "function") {
+		return dataUrlCondition;
 	}
 	throw new Error(
 		`unreachable: AssetParserDataUrl type should be one of "options", but got ${dataUrlCondition}`
@@ -825,7 +822,7 @@ function getRawAssetGeneratorDataUrl(dataUrl: AssetGeneratorDataUrl) {
 			mimetype: dataUrl.mimetype
 		} as const;
 	}
-	if (typeof dataUrl === "function" && dataUrl !== null) {
+	if (typeof dataUrl === "function") {
 		return dataUrl;
 	}
 	throw new Error(

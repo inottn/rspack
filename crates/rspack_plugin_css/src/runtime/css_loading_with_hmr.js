@@ -14,7 +14,7 @@ var applyHandler = function (options) {
 			}
 			while (newTags.length) {
 				var info = newTags.pop();
-				var chunkModuleIds = loadCssChunkData(__webpack_require__.m, info[1], info[0]);
+				var chunkModuleIds = loadCssChunkData(__webpack_require__.m, info[0]);
 				chunkModuleIds.forEach(function(id) {
 				    moduleIds.push(id)
 				});
@@ -72,7 +72,7 @@ __webpack_require__.hmrC.css = function (
 								}
 							} catch (e) {}
 							var factories = {};
-							loadCssChunkData(factories, link, chunkId);
+							loadCssChunkData(factories, chunkId);
 							Object.keys(factories).forEach(function(id) {
 							    (updatedModulesList.push(id));
 							});
