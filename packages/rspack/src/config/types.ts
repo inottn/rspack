@@ -935,10 +935,19 @@ export type AssetParserDataUrlOptions = {
 	maxSize?: number | undefined;
 };
 
+export type AssetParserDataUrlFunction = (
+	source: Buffer,
+	context: {
+		filename: string;
+	}
+) => boolean;
+
 /**
  * Options object for DataUrl condition.
  * */
-export type AssetParserDataUrl = AssetParserDataUrlOptions;
+export type AssetParserDataUrl =
+	| AssetParserDataUrlOptions
+	| AssetParserDataUrlFunction;
 
 /** Options object for `asset` modules. */
 export type AssetParserOptions = {
@@ -946,7 +955,7 @@ export type AssetParserOptions = {
 	 * It be used only for Asset Module scenarios.
 	 * @default { maxSize: 8096 }
 	 * */
-	dataUrlCondition?: AssetParserDataUrlOptions;
+	dataUrlCondition?: AssetParserDataUrl;
 };
 
 export type CssParserNamedExports = boolean;

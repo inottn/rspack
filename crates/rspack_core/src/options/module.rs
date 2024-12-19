@@ -256,11 +256,42 @@ pub struct AssetParserOptions {
   pub data_url_condition: Option<AssetParserDataUrl>,
 }
 
+pub type AssetParserDataUrlFn =
+  Arc<dyn Fn(Vec<u8>, AssetParserDataUrlFnCtx) -> Result<bool> + Sync + Send>;
+
+pub struct AssetParserDataUrlFnCtx {
+  pub filename: String,
+  // TODO: add module field
+}
+
 #[cacheable]
-#[derive(Debug, Clone, MergeFrom)]
 pub enum AssetParserDataUrl {
   Options(AssetParserDataUrlOptions),
-  // TODO: Function
+  Func(#[cacheable(with=Unsupported)] AssetParserDataUrlFn),
+}
+
+impl fmt::Debug for AssetParserDataUrl {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Options(i) => i.fmt(f),
+      Self::Func(_) => "Func(...)".fmt(f),
+    }
+  }
+}
+
+impl Clone for AssetParserDataUrl {
+  fn clone(&self) -> Self {
+    match self {
+      Self::Options(i) => Self::Options(i.clone()),
+      Self::Func(i) => Self::Func(i.clone()),
+    }
+  }
+}
+
+impl MergeFrom for AssetParserDataUrl {
+  fn merge_from(self, other: &Self) -> Self {
+    other.clone()
+  }
 }
 
 #[cacheable]

@@ -7,7 +7,7 @@ use napi::Either;
 use napi_derive::napi;
 use rspack_core::{
   AssetGeneratorDataUrl, AssetGeneratorDataUrlFnCtx, AssetGeneratorDataUrlOptions,
-  AssetGeneratorOptions, AssetInlineGeneratorOptions, AssetParserDataUrl,
+  AssetGeneratorOptions, AssetInlineGeneratorOptions, AssetParserDataUrl, AssetParserDataUrlFnCtx,
   AssetParserDataUrlOptions, AssetParserOptions, AssetResourceGeneratorOptions,
   CssAutoGeneratorOptions, CssAutoParserOptions, CssGeneratorOptions, CssModuleGeneratorOptions,
   CssModuleParserOptions, CssParserOptions, DescriptionData, DynamicImportFetchPriority,
@@ -180,7 +180,7 @@ pub struct RawModuleRule {
 }
 
 #[derive(Debug, Default)]
-#[napi(object)]
+#[napi(object, object_to_js = false)]
 pub struct RawParserOptions {
   #[napi(
     ts_type = r#""asset" | "css" | "css/auto" | "css/module" | "javascript" | "javascript/auto" | "javascript/dynamic" | "javascript/esm""#
@@ -330,41 +330,54 @@ impl From<RawJavascriptParserOptions> for JavascriptParserOptions {
 }
 
 #[derive(Debug, Default)]
-#[napi(object)]
+#[napi(object, object_to_js = false)]
 pub struct RawAssetParserOptions {
+  #[debug(skip)]
+  #[napi(
+    ts_type = "RawAssetParserDataUrlOptions | ((source: Buffer, context: RawAssetParserDataUrlFnCtx) => boolean)"
+  )]
   pub data_url_condition: Option<RawAssetParserDataUrl>,
 }
 
 impl From<RawAssetParserOptions> for AssetParserOptions {
   fn from(value: RawAssetParserOptions) -> Self {
     Self {
-      data_url_condition: value.data_url_condition.map(|i| i.into()),
+      data_url_condition: value
+        .data_url_condition
+        .map(|i| RawAssetParserDataUrlWrapper(i).into()),
     }
   }
 }
 
-#[derive(Debug, Default)]
+type RawAssetParserDataUrl = Either<
+  RawAssetParserDataUrlOptions,
+  ThreadsafeFunction<(Buffer, RawAssetParserDataUrlFnCtx), bool>,
+>;
+
+struct RawAssetParserDataUrlWrapper(RawAssetParserDataUrl);
+
+#[derive(Debug, Clone)]
 #[napi(object)]
-pub struct RawAssetParserDataUrl {
-  #[napi(ts_type = r#""options""#)]
-  pub r#type: String,
-  pub options: Option<RawAssetParserDataUrlOptions>,
-  // TODO: pub function
+pub struct RawAssetParserDataUrlFnCtx {
+  pub filename: String,
 }
 
-impl From<RawAssetParserDataUrl> for AssetParserDataUrl {
-  fn from(value: RawAssetParserDataUrl) -> Self {
-    match value.r#type.as_str() {
-      "options" => Self::Options(
-        value
-          .options
-          .expect("should have an \"options\" when RawAssetParserDataUrl.type is \"options\"")
-          .into(),
-      ),
-      _ => panic!(
-        "Failed to resolve the RawAssetParserDataUrl.type {}. Expected type is `options`.",
-        value.r#type
-      ),
+impl From<AssetParserDataUrlFnCtx> for RawAssetParserDataUrlFnCtx {
+  fn from(value: AssetParserDataUrlFnCtx) -> Self {
+    Self {
+      filename: value.filename,
+    }
+  }
+}
+
+impl From<RawAssetParserDataUrlWrapper> for AssetParserDataUrl {
+  fn from(value: RawAssetParserDataUrlWrapper) -> Self {
+    use pollster::block_on;
+    match value.0 {
+      Either::A(a) => Self::Options(a.into()),
+      Either::B(b) => Self::Func(Arc::new(move |source, ctx| {
+        block_on(b.call((source.into(), ctx.into())))
+      })),
     }
   }
 }

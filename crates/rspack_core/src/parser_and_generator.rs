@@ -30,6 +30,7 @@ pub struct ParseContext<'a> {
   pub module_source_map_kind: SourceMapKind,
   #[debug(skip)]
   pub loaders: &'a [BoxLoader],
+  pub match_resource: Option<&'a ResourceData>,
   pub resource_data: &'a ResourceData,
   pub compiler_options: &'a CompilerOptions,
   pub additional_data: Option<AdditionalData>,

@@ -584,6 +584,7 @@ impl Module for NormalModule {
         module_user_request: &self.user_request,
         module_source_map_kind: *self.get_source_map_kind(),
         loaders: &self.loaders,
+        match_resource: self.match_resource.as_ref(),
         resource_data: &self.resource_data,
         compiler_options: &build_context.compiler_options,
         additional_data: loader_result.additional_data,
