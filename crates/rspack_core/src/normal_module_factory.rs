@@ -514,6 +514,9 @@ impl NormalModuleFactory {
 
     let file_dependency = resource_data.resource_path.clone();
 
+    // println!("matched module type: {:?}", match_module_type);
+    // println!("resolved module rules: {:?}", resolved_module_rules);
+
     let resolved_module_type =
       self.calculate_module_type(match_module_type, &resolved_module_rules);
     let resolved_module_layer =
@@ -524,15 +527,29 @@ impl NormalModuleFactory {
       ));
     }
 
+    // println!("resolved_module_type: {:?}", resolved_module_type);
+
     let resolved_resolve_options = self.calculate_resolve_options(&resolved_module_rules);
     let (resolved_parser_options, resolved_generator_options) =
       self.calculate_parser_and_generator_options(&resolved_module_rules);
+
+    // println!(
+    //   "resolved_generator_options: {:?}",
+    //   resolved_generator_options
+    // );
+
     let (resolved_parser_options, resolved_generator_options) = self
       .merge_global_parser_and_generator_options(
         &resolved_module_type,
         resolved_parser_options,
         resolved_generator_options,
       );
+
+    // println!(
+    //   "resolved_generator_options: {:?}",
+    //   resolved_generator_options
+    // );
+
     let resolved_side_effects = self.calculate_side_effects(&resolved_module_rules);
     let mut resolved_parser_and_generator = self
       .plugin_driver
@@ -688,18 +705,13 @@ impl NormalModuleFactory {
     parser: Option<ParserOptions>,
     generator: Option<GeneratorOptions>,
   ) -> (Option<ParserOptions>, Option<GeneratorOptions>) {
-    let global_parser = self
-      .options
-      .module
-      .parser
-      .as_ref()
-      .and_then(|p| match module_type {
+    let global_parser = self.options.module.parser.as_ref().and_then(|p| {
+      let options = p.get(module_type.as_str());
+      match module_type {
         ModuleType::JsAuto | ModuleType::JsDynamic | ModuleType::JsEsm => {
-          let options = p.get(module_type.as_str());
-          let javascript_options = p.get("javascript").cloned();
           // Merge `module.parser.["javascript/xxx"]` with `module.parser.["javascript"]` first
           rspack_util::merge_from_optional_with(
-            javascript_options,
+            p.get("javascript").cloned(),
             options,
             |javascript_options, options| match (javascript_options, options) {
               (
@@ -712,14 +724,57 @@ impl NormalModuleFactory {
             },
           )
         }
-        _ => p.get(module_type.as_str()).cloned(),
-      });
-    let global_generator = self
-      .options
-      .module
-      .generator
-      .as_ref()
-      .and_then(|g| g.get(module_type.as_str()).cloned());
+        ModuleType::CssAuto | ModuleType::CssModule => rspack_util::merge_from_optional_with(
+          p.get("css").cloned(),
+          options,
+          |css_options, options| match (css_options, options) {
+            (ParserOptions::Css(a), ParserOptions::CssAuto(b)) => {
+              ParserOptions::CssAuto(a.to_css_auto_options().merge_from(b))
+            }
+            (ParserOptions::Css(a), ParserOptions::CssModule(b)) => {
+              ParserOptions::CssModule(a.to_css_module_options().merge_from(b))
+            }
+            _ => unreachable!(),
+          },
+        ),
+        _ => options.cloned(),
+      }
+    });
+    let global_generator = self.options.module.generator.as_ref().and_then(|g| {
+      let options = g.get(module_type.as_str());
+
+      match module_type {
+        ModuleType::AssetInline | ModuleType::AssetResource => {
+          rspack_util::merge_from_optional_with(
+            g.get("asset").cloned(),
+            options,
+            |asset_options, options| match (asset_options, options) {
+              (GeneratorOptions::Asset(a), GeneratorOptions::AssetInline(b)) => {
+                GeneratorOptions::AssetInline(a.to_asset_inline_options().merge_from(b))
+              }
+              (GeneratorOptions::Asset(a), GeneratorOptions::AssetResource(b)) => {
+                GeneratorOptions::AssetResource(a.to_asset_resource_options().merge_from(b))
+              }
+              _ => unreachable!(),
+            },
+          )
+        }
+        ModuleType::CssAuto | ModuleType::CssModule => rspack_util::merge_from_optional_with(
+          g.get("css").cloned(),
+          options,
+          |css_options, options| match (css_options, options) {
+            (GeneratorOptions::Css(a), GeneratorOptions::CssAuto(b)) => {
+              GeneratorOptions::CssAuto(a.to_css_auto_options().merge_from(b))
+            }
+            (GeneratorOptions::Css(a), GeneratorOptions::CssModule(b)) => {
+              GeneratorOptions::CssModule(a.to_css_module_options().merge_from(b))
+            }
+            _ => unreachable!(),
+          },
+        ),
+        _ => options.cloned(),
+      }
+    });
     let parser = rspack_util::merge_from_optional_with(
       global_parser,
       parser.as_ref(),

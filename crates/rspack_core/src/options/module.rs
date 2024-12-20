@@ -275,6 +275,20 @@ pub struct CssParserOptions {
   pub named_exports: Option<bool>,
 }
 
+impl CssParserOptions {
+  pub fn to_css_auto_options(&self) -> CssAutoParserOptions {
+    CssAutoParserOptions {
+      named_exports: self.named_exports,
+    }
+  }
+
+  pub fn to_css_module_options(&self) -> CssModuleParserOptions {
+    CssModuleParserOptions {
+      named_exports: self.named_exports,
+    }
+  }
+}
+
 #[cacheable]
 #[derive(Debug, Clone, MergeFrom)]
 pub struct CssAutoParserOptions {
@@ -395,6 +409,23 @@ pub struct AssetGeneratorOptions {
   pub data_url: Option<AssetGeneratorDataUrl>,
 }
 
+impl AssetGeneratorOptions {
+  pub fn to_asset_inline_options(&self) -> AssetInlineGeneratorOptions {
+    AssetInlineGeneratorOptions {
+      data_url: self.data_url.clone(),
+    }
+  }
+
+  pub fn to_asset_resource_options(&self) -> AssetResourceGeneratorOptions {
+    AssetResourceGeneratorOptions {
+      emit: self.emit,
+      filename: self.filename.clone(),
+      output_path: self.output_path.clone(),
+      public_path: self.public_path.clone(),
+    }
+  }
+}
+
 pub struct AssetGeneratorDataUrlFnCtx<'a> {
   pub filename: String,
   pub module: &'a dyn Module,
@@ -474,8 +505,26 @@ pub struct CssGeneratorOptions {
   pub es_module: Option<bool>,
 }
 
+impl CssGeneratorOptions {
+  pub fn to_css_auto_options(&self) -> CssAutoGeneratorOptions {
+    CssAutoGeneratorOptions {
+      exports_only: self.exports_only,
+      es_module: self.es_module,
+      ..Default::default()
+    }
+  }
+
+  pub fn to_css_module_options(&self) -> CssModuleGeneratorOptions {
+    CssModuleGeneratorOptions {
+      exports_only: self.exports_only,
+      es_module: self.es_module,
+      ..Default::default()
+    }
+  }
+}
+
 #[cacheable]
-#[derive(Debug, Clone, MergeFrom)]
+#[derive(Default, Debug, Clone, MergeFrom)]
 pub struct CssAutoGeneratorOptions {
   pub exports_convention: Option<CssExportsConvention>,
   pub exports_only: Option<bool>,
@@ -484,7 +533,7 @@ pub struct CssAutoGeneratorOptions {
 }
 
 #[cacheable]
-#[derive(Debug, Clone, MergeFrom)]
+#[derive(Default, Debug, Clone, MergeFrom)]
 pub struct CssModuleGeneratorOptions {
   pub exports_convention: Option<CssExportsConvention>,
   pub exports_only: Option<bool>,

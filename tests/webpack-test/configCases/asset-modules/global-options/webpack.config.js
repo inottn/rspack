@@ -5,28 +5,22 @@ const mimeTypes = require("mime-types");
 module.exports = {
 	mode: "development",
 	module: {
-		parser: {
-			asset: {
-				dataUrlCondition: (source, { filename }) => {
-					return filename.includes("?inline");
-				}
-			}
-		},
+		// parser: {
+		// 	asset: {
+		// 		dataUrlCondition: (source, { filename }) => {
+		// 			return filename.includes("?inline");
+		// 		}
+		// 	}
+		// },
 		generator: {
 			asset: {
-				dataUrl: (source, { module }) => {
-					const mimeType = mimeTypes.lookup(module.nameForCondition());
-					if (mimeType === "image/svg+xml") {
-						if (typeof source !== "string") {
-							source = source.toString();
-						}
-
-						return svgToMiniDataURI(source);
-					}
-
-					const encodedContent = source.toString("base64");
-
-					return `DATA:${mimeType};base64,${encodedContent}`;
+				dataUrl: {
+					encoding: "base64",
+				}
+			},
+			"asset/inline": {
+				dataUrl: {
+					encoding: false,
 				}
 			}
 		},
