@@ -5,7 +5,9 @@ pub fn property_access<S: AsRef<str>>(o: impl IntoIterator<Item = S>, start: usi
     .skip(start)
     .fold(String::default(), |mut str, property| {
       let property = property.as_ref();
-      if SAFE_IDENTIFIER.is_match(property) && !RESERVED_IDENTIFIER.contains(property) {
+      if let Ok(property) = property.parse::<usize>() {
+        str.push_str(format!("[{}]", property).as_str());
+      } else if SAFE_IDENTIFIER.is_match(property) && !RESERVED_IDENTIFIER.contains(property) {
         str.push_str(format!(".{property}").as_str());
       } else {
         str.push_str(
