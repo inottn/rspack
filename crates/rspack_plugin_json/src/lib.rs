@@ -14,6 +14,7 @@ use json::{
 use rspack_cacheable::{cacheable, cacheable_dyn};
 use rspack_core::{
   diagnostics::ModuleParseError,
+  remove_bom,
   rspack_sources::{BoxSource, RawStringSource, Source, SourceExt},
   BuildMetaDefaultObject, BuildMetaExportsType, ChunkGraph, CompilerOptions, ExportsInfo,
   GenerateContext, Module, ModuleGraph, ParseOption, ParserAndGenerator, Plugin, RuntimeGlobals,
@@ -52,46 +53,39 @@ impl ParserAndGenerator for JsonParserAndGenerator {
     parse_context: rspack_core::ParseContext,
   ) -> Result<TWithDiagnosticArray<rspack_core::ParseResult>> {
     let rspack_core::ParseContext {
-      source: box_source,
+      source,
       build_info,
       build_meta,
       loaders,
       module_parser_options,
       ..
     } = parse_context;
-    let source = box_source.source();
-    let strip_bom_source = source.strip_prefix('\u{feff}');
-    let need_strip_bom = strip_bom_source.is_some();
-    let strip_bom_source = strip_bom_source.unwrap_or(&source);
+    let source = remove_bom(source);
+    let source_code = source.source();
 
     // If there is a custom parse, execute it to obtain the returned string.
     let parse_result_str = module_parser_options
       .and_then(|p| p.get_json())
       .and_then(|p| match &p.parse {
         ParseOption::Func(p) => {
-          let parse_result = p(strip_bom_source.to_string());
+          let parse_result = p(source_code.to_string());
           parse_result.ok()
         }
         _ => None,
       });
 
-    let parse_result = json::parse(parse_result_str.as_deref().unwrap_or(strip_bom_source))
-      .map_err(|e| {
+    let parse_result =
+      json::parse(parse_result_str.as_deref().unwrap_or(&source_code)).map_err(|e| {
         match e {
           UnexpectedCharacter { ch, line, column } => {
-            let rope = ropey::Rope::from_str(&source);
+            let rope = ropey::Rope::from_str(&source_code);
             let line_offset = rope.try_line_to_byte(line - 1).expect("TODO:");
-            let start_offset = source[line_offset..]
+            let start_offset = source_code[line_offset..]
               .chars()
               .take(column)
               .fold(line_offset, |acc, cur| acc + cur.len_utf8());
-            let start_offset = if need_strip_bom {
-              start_offset + 1
-            } else {
-              start_offset
-            };
             TraceableError::from_file(
-              source.into_owned(),
+              source_code.into_owned(),
               // one character offset
               start_offset,
               start_offset + 1,
@@ -104,10 +98,10 @@ impl ParserAndGenerator for JsonParserAndGenerator {
           ExceededDepthLimit | WrongType(_) | FailedUtf8Parsing => diagnostic!("{e}").boxed(),
           UnexpectedEndOfJson => {
             // End offset of json file
-            let length = source.len();
+            let length = source_code.len();
             let offset = if length > 0 { length - 1 } else { length };
             TraceableError::from_file(
-              source.into_owned(),
+              source_code.into_owned(),
               offset,
               offset,
               "Json parsing error".to_string(),
@@ -145,7 +139,7 @@ impl ParserAndGenerator for JsonParserAndGenerator {
         },
         blocks: vec![],
         code_generation_dependencies: vec![],
-        source: box_source,
+        source,
         side_effects_bailout: None,
       }
       .with_diagnostic(diagnostics),
