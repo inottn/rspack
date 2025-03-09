@@ -182,6 +182,7 @@ interface Webworker {
 export const webworker: Webworker = { WebWorkerTemplatePlugin };
 
 import { LimitChunkCountPlugin } from "./builtin-plugin";
+import { MinChunkSizePlugin } from "./builtin-plugin";
 import { RuntimeChunkPlugin } from "./builtin-plugin";
 import { SplitChunksPlugin } from "./builtin-plugin";
 import { RemoveDuplicateModulesPlugin } from "./builtin-plugin";
@@ -189,11 +190,13 @@ import { RsdoctorPlugin } from "./builtin-plugin";
 
 interface Optimize {
 	LimitChunkCountPlugin: typeof LimitChunkCountPlugin;
+	MinChunkSizePlugin: typeof MinChunkSizePlugin;
 	RuntimeChunkPlugin: typeof RuntimeChunkPlugin;
 	SplitChunksPlugin: typeof SplitChunksPlugin;
 }
 export const optimize: Optimize = {
 	LimitChunkCountPlugin,
+	MinChunkSizePlugin,
 	RuntimeChunkPlugin,
 	SplitChunksPlugin
 };

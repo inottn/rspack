@@ -10,6 +10,7 @@ mod raw_lazy_compilation;
 mod raw_lightning_css_minimizer;
 mod raw_limit_chunk_count;
 mod raw_mf;
+mod raw_min_chunk_size;
 mod raw_progress;
 mod raw_runtime_chunk;
 mod raw_size_limits;
@@ -65,6 +66,7 @@ use rspack_plugin_mf::{
   ConsumeSharedPlugin, ContainerPlugin, ContainerReferencePlugin, ModuleFederationRuntimePlugin,
   ProvideSharedPlugin, ShareRuntimePlugin,
 };
+use rspack_plugin_min_chunk_size::MinChunkSizePlugin;
 use rspack_plugin_no_emit_on_errors::NoEmitOnErrorsPlugin;
 use rspack_plugin_progress::ProgressPlugin;
 use rspack_plugin_real_content_hash::RealContentHashPlugin;
@@ -103,6 +105,7 @@ use self::{
   raw_css_extract::RawCssExtractPluginOption,
   raw_lazy_compilation::{JsBackend, RawLazyCompilationOption},
   raw_mf::{RawConsumeSharedPluginOptions, RawContainerReferencePluginOptions, RawProvideOptions},
+  raw_min_chunk_size::RawMinChunkSizePluginOptions,
   raw_runtime_chunk::RawRuntimeChunkOptions,
   raw_size_limits::RawSizeLimitsPluginOptions,
 };
@@ -138,6 +141,7 @@ pub enum BuiltinPluginName {
   ModuleChunkFormatPlugin,
   HotModuleReplacementPlugin,
   LimitChunkCountPlugin,
+  MinChunkSizePlugin,
   WorkerPlugin,
   WebWorkerTemplatePlugin,
   MergeDuplicateChunksPlugin,
@@ -307,6 +311,13 @@ impl BuiltinPlugin {
       BuiltinPluginName::LimitChunkCountPlugin => {
         let plugin = LimitChunkCountPlugin::new(
           downcast_into::<RawLimitChunkCountPluginOptions>(self.options)?.into(),
+        )
+        .boxed();
+        plugins.push(plugin);
+      }
+      BuiltinPluginName::MinChunkSizePlugin => {
+        let plugin = MinChunkSizePlugin::new(
+          downcast_into::<RawMinChunkSizePluginOptions>(self.options)?.into(),
         )
         .boxed();
         plugins.push(plugin);

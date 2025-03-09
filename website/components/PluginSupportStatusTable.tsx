@@ -92,7 +92,8 @@ const pluginSupportStatusList: PluginSupportStatus[] = [
   },
   {
     name: 'MinChunkSizePlugin',
-    status: SupportStatus.NotSupported,
+    url: '/plugins/webpack/min-chunk-size-plugin',
+    status: SupportStatus.FullySupported,
   },
   {
     name: 'ModuleConcatenationPlugin',

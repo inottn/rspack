@@ -335,6 +335,7 @@ export declare enum BuiltinPluginName {
   ModuleChunkFormatPlugin = 'ModuleChunkFormatPlugin',
   HotModuleReplacementPlugin = 'HotModuleReplacementPlugin',
   LimitChunkCountPlugin = 'LimitChunkCountPlugin',
+  MinChunkSizePlugin = 'MinChunkSizePlugin',
   WorkerPlugin = 'WorkerPlugin',
   WebWorkerTemplatePlugin = 'WebWorkerTemplatePlugin',
   MergeDuplicateChunksPlugin = 'MergeDuplicateChunksPlugin',
@@ -1878,6 +1879,12 @@ export interface RawLimitChunkCountPluginOptions {
   chunkOverhead?: number
   entryChunkMultiplicator?: number
   maxChunks: number
+}
+
+export interface RawMinChunkSizePluginOptions {
+  chunkOverhead?: number
+  entryChunkMultiplicator?: number
+  minChunkSize: number
 }
 
 export interface RawModuleArg {
