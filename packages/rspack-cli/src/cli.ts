@@ -51,14 +51,9 @@ export class RspackCLI {
 
 		let config = await this.loadConfig(options);
 		config = await this.buildConfig(config, options, rspackCommand);
-
-		const isWatch = Array.isArray(config)
-			? (config as MultiRspackOptions).some(i => i.watch)
-			: (config as RspackOptions).watch;
-
 		let compiler: MultiCompiler | Compiler | null;
 		try {
-			compiler = rspack(config, isWatch ? callback : undefined);
+			compiler = rspack(config, callback);
 		} catch (e) {
 			// Aligned with webpack-cli
 			// See: https://github.com/webpack/webpack-cli/blob/eea6adf7d34dfbfd3b5b784ece4a4664834f5a6a/packages/webpack-cli/src/webpack-cli.ts#L2394
