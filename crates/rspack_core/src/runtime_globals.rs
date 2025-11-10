@@ -264,6 +264,8 @@ bitflags! {
     const ASYNC_MODULE_EXPORT_SYMBOL = 1 << 69;
     const MAKE_DEFERRED_NAMESPACE_OBJECT = 1 << 70;
     const MAKE_DEFERRED_NAMESPACE_OBJECT_SYMBOL = 1 << 71;
+
+    const TO_BINARY = 1 << 72;
   }
 }
 
@@ -349,6 +351,7 @@ pub fn runtime_globals_to_string(
     RuntimeGlobals::PRELOAD_CHUNK => format!("{scope_name}.G"),
     RuntimeGlobals::PRELOAD_CHUNK_HANDLERS => format!("{scope_name}.H"),
     RuntimeGlobals::UNCAUGHT_ERROR_HANDLER => format!("{scope_name}.oe"),
+    RuntimeGlobals::TO_BINARY => format!("{scope_name}.tb"),
     // rspack only
     RuntimeGlobals::RSPACK_VERSION => format!("{scope_name}.rv"),
     RuntimeGlobals::RSPACK_UNIQUE_ID => format!("{scope_name}.ruid"),

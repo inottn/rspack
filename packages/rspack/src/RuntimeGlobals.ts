@@ -453,7 +453,12 @@ enum RuntimeGlobals {
 
 	makeDeferredNamespaceObject,
 
-	makeDeferredNamespaceObjectSymbol
+	makeDeferredNamespaceObjectSymbol,
+
+	/**
+	 * to binary helper, convert base64 to Uint8Array
+	 */
+	toBinary
 }
 
 export const isReservedRuntimeGlobal = (
