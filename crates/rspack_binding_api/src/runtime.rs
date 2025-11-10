@@ -101,6 +101,7 @@ static RUNTIME_GLOBAL_MAP: LazyLock<RuntimeGlobalMap> = LazyLock::new(|| {
   declare_runtime_global!(ASYNC_MODULE_EXPORT_SYMBOL);
   declare_runtime_global!(MAKE_DEFERRED_NAMESPACE_OBJECT);
   declare_runtime_global!(MAKE_DEFERRED_NAMESPACE_OBJECT_SYMBOL);
+  declare_runtime_global!(TO_BINARY);
 
   to_js_map.shrink_to_fit();
   from_js_map.shrink_to_fit();

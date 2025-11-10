@@ -262,6 +262,8 @@ bitflags! {
     const ASYNC_MODULE_EXPORT_SYMBOL = 1 << 69;
     const MAKE_DEFERRED_NAMESPACE_OBJECT = 1 << 70;
     const MAKE_DEFERRED_NAMESPACE_OBJECT_SYMBOL = 1 << 71;
+
+    const TO_BINARY = 1 << 72;
   }
 }
 
@@ -354,6 +356,7 @@ impl RuntimeGlobals {
       R::HAS_CSS_MODULES => "has css modules",
 
       R::HAS_FETCH_PRIORITY => "has fetch priority",
+      R::TO_BINARY => "__webpack_require__.tb",
       _ => unreachable!(),
     }
   }

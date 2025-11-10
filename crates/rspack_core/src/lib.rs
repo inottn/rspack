@@ -193,6 +193,7 @@ pub enum ModuleType {
   AssetInline,
   AssetResource,
   AssetSource,
+  AssetBytes,
   Asset,
   Runtime,
   Remote,
@@ -262,6 +263,7 @@ impl ModuleType {
       ModuleType::AssetSource => "asset/source",
       ModuleType::AssetResource => "asset/resource",
       ModuleType::AssetInline => "asset/inline",
+      ModuleType::AssetBytes => "asset/bytes",
       ModuleType::Runtime => "runtime",
       ModuleType::Remote => "remote-module",
       ModuleType::Fallback => "fallback-module",
@@ -302,6 +304,7 @@ impl From<&str> for ModuleType {
       "asset/resource" => Self::AssetResource,
       "asset/source" => Self::AssetSource,
       "asset/inline" => Self::AssetInline,
+      "asset/bytes" => Self::AssetBytes,
 
       custom => Self::Custom(custom.into()),
     }

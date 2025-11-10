@@ -187,6 +187,8 @@ export class NodeRunner implements ITestRunner {
 			},
 			process,
 			URL,
+			TextEncoder,
+			TextDecoder,
 			Blob,
 			Symbol,
 			Buffer,

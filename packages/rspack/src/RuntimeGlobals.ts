@@ -432,7 +432,12 @@ export const RuntimeGlobals = {
 
 	makeDeferredNamespaceObject: "__webpack_require__.z",
 
-	makeDeferredNamespaceObjectSymbol: "__webpack_require__.zS"
+	makeDeferredNamespaceObjectSymbol: "__webpack_require__.zS",
+
+	/**
+	 * to binary helper, convert base64 to Uint8Array
+	 */
+	toBinary: "__webpack_require__.tb"
 } as const;
 
 for (const entry of Object.entries(RuntimeGlobals)) {

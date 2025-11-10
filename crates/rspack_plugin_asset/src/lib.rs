@@ -46,6 +46,7 @@ const DEFAULT_ENCODING: &str = "base64";
 #[cacheable]
 #[derive(Debug)]
 enum DataUrlOptions {
+  Bytes,
   Inline(bool),
   Source,
   Auto(Option<AssetParserDataUrl>),
@@ -59,11 +60,16 @@ const ASSET_RESOURCE: bool = false;
 #[cacheable]
 #[derive(Debug, Clone)]
 enum CanonicalizedDataUrlOption {
+  Bytes,
   Source,
   Asset(IsInline),
 }
 
 impl CanonicalizedDataUrlOption {
+  fn is_bytes(&self) -> bool {
+    matches!(self, CanonicalizedDataUrlOption::Bytes)
+  }
+
   fn is_source(&self) -> bool {
     matches!(self, CanonicalizedDataUrlOption::Source)
   }
@@ -114,6 +120,14 @@ impl AssetParserAndGenerator {
     Self {
       emit: false,
       data_url: DataUrlOptions::Source,
+      parsed_asset_config: None,
+    }
+  }
+
+  pub fn with_bytes() -> Self {
+    Self {
+      emit: false,
+      data_url: DataUrlOptions::Bytes,
       parsed_asset_config: None,
     }
   }
@@ -416,6 +430,7 @@ impl ParserAndGenerator for AssetParserAndGenerator {
 
         let parsed_size = self.parsed_asset_config.as_ref().map(|config| {
           match config {
+            CanonicalizedDataUrlOption::Bytes => original_source_size,
             CanonicalizedDataUrlOption::Source => original_source_size,
             CanonicalizedDataUrlOption::Asset(meta) => {
               match *meta {
@@ -460,6 +475,7 @@ impl ParserAndGenerator for AssetParserAndGenerator {
     let size = source.size();
 
     self.parsed_asset_config = match &self.data_url {
+      DataUrlOptions::Bytes => Some(CanonicalizedDataUrlOption::Bytes),
       DataUrlOptions::Source => Some(CanonicalizedDataUrlOption::Source),
       DataUrlOptions::Inline(val) => Some(CanonicalizedDataUrlOption::Asset(*val)),
       DataUrlOptions::Auto(option) => {
@@ -520,6 +536,7 @@ impl ParserAndGenerator for AssetParserAndGenerator {
 
     match generate_context.requested_source_type {
       SourceType::JavaScript | SourceType::CssUrl => {
+        let is_css_url = generate_context.requested_source_type == SourceType::CssUrl;
         let exported_content = if parsed_asset_config.is_inline() {
           let resource_data: &ResourceData = normal_module.resource_resolved_data();
           let data_url = module_generator_options.and_then(|x| x.asset_data_url());
@@ -626,11 +643,32 @@ impl ParserAndGenerator for AssetParserAndGenerator {
           asset_path
         } else if parsed_asset_config.is_source() {
           format!(r"{:?}", source.source().into_string_lossy())
+        } else if parsed_asset_config.is_bytes() {
+          let encoded_source = base64::encode_to_string(source.buffer());
+          if is_css_url {
+            let url = format!(r#"data:application/octet-stream;base64,{}"#, encoded_source);
+            generate_context
+              .data
+              .insert(CodeGenerationDataUrl::new(url));
+            encoded_source
+          } else {
+            generate_context
+              .runtime_requirements
+              .insert(RuntimeGlobals::REQUIRE_SCOPE);
+            generate_context
+              .runtime_requirements
+              .insert(RuntimeGlobals::TO_BINARY);
+            format!(
+              r"{}({:?})",
+              RuntimeGlobals::TO_BINARY.name(),
+              encoded_source
+            )
+          }
         } else {
           unreachable!()
         };
 
-        if generate_context.requested_source_type == SourceType::CssUrl {
+        if is_css_url {
           return Ok(RawStringSource::from_static("").boxed());
         }
 
@@ -889,6 +927,11 @@ impl Plugin for AssetPlugin {
     ctx.register_parser_and_generator_builder(
       rspack_core::ModuleType::AssetSource,
       Box::new(move |_, _| Box::new(AssetParserAndGenerator::with_source())),
+    );
+
+    ctx.register_parser_and_generator_builder(
+      rspack_core::ModuleType::AssetBytes,
+      Box::new(move |_, _| Box::new(AssetParserAndGenerator::with_bytes())),
     );
 
     Ok(())

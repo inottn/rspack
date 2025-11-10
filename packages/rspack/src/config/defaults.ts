@@ -417,7 +417,7 @@ const applyModuleDefaults = (
 		D(
 			module.generator.css,
 			"exportsOnly",
-			!targetProperties || !targetProperties.document
+			!targetProperties || targetProperties.document === false
 		);
 		D(module.generator.css, "esModule", true);
 
@@ -426,7 +426,7 @@ const applyModuleDefaults = (
 		D(
 			module.generator["css/auto"],
 			"exportsOnly",
-			!targetProperties || !targetProperties.document
+			!targetProperties || targetProperties.document === false
 		);
 		D(module.generator["css/auto"], "exportsConvention", "as-is");
 		const localIdentName =
@@ -441,7 +441,7 @@ const applyModuleDefaults = (
 		D(
 			module.generator["css/module"],
 			"exportsOnly",
-			!targetProperties || !targetProperties.document
+			!targetProperties || targetProperties.document === false
 		);
 		D(module.generator["css/module"], "exportsConvention", "as-is");
 		D(module.generator["css/module"], "localIdentName", localIdentName);
@@ -569,6 +569,10 @@ const applyModuleDefaults = (
 			{
 				with: { type: "json" },
 				type: "json"
+			},
+			{
+				with: { type: "bytes" },
+				type: "asset/bytes"
 			}
 		);
 

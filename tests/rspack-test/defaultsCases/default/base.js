@@ -179,6 +179,12 @@ module.exports = {
 		          type: json,
 		        },
 		      },
+		      Object {
+		        type: asset/bytes,
+		        with: Object {
+		          type: bytes,
+		        },
+		      },
 		    ],
 		    generator: Object {
 		      json: Object {

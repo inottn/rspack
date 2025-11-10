@@ -7049,6 +7049,7 @@ export const RuntimeGlobals: {
     readonly asyncModuleExportSymbol: "__webpack_require__.aE";
     readonly makeDeferredNamespaceObject: "__webpack_require__.z";
     readonly makeDeferredNamespaceObjectSymbol: "__webpack_require__.zS";
+    readonly toBinary: "__webpack_require__.tb";
 };
 
 // @public (undocumented)
