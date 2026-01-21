@@ -24,8 +24,8 @@ use rspack_cacheable::{
 use rspack_core::{
   AsyncDependenciesBlock, BoxDependency, BoxDependencyTemplate, BuildInfo, BuildMeta,
   CompilerOptions, DependencyRange, FactoryMeta, JavascriptParserCommonjsExportsOption,
-  JavascriptParserOptions, ModuleIdentifier, ModuleLayer, ModuleType, ParseMeta, ResourceData,
-  RuntimeTemplate, SideEffectsBailoutItemWithSpan,
+  JavascriptParserImportMeta, JavascriptParserOptions, ModuleIdentifier, ModuleLayer, ModuleType,
+  ParseMeta, ResourceData, RuntimeTemplate, SideEffectsBailoutItemWithSpan,
 };
 use rspack_error::{Diagnostic, Result};
 use rspack_util::{SpanExt, fx_hash::FxIndexSet};
@@ -418,10 +418,10 @@ impl<'parser> JavascriptParser<'parser> {
       plugins.push(Box::new(
         parser_plugin::ImportMetaContextDependencyParserPlugin,
       ));
-      if let Some(true) = javascript_options.import_meta {
-        plugins.push(Box::new(parser_plugin::ImportMetaPlugin));
-      } else {
+      if let Some(JavascriptParserImportMeta::Disable) = javascript_options.import_meta {
         plugins.push(Box::new(parser_plugin::ImportMetaDisabledPlugin));
+      } else {
+        plugins.push(Box::new(parser_plugin::ImportMetaPlugin));
       }
 
       plugins.push(Box::new(parser_plugin::ESMImportDependencyParserPlugin));

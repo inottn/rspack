@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use rspack_core::{ConstDependency, property_access};
+use rspack_core::{ConstDependency, JavascriptParserImportMeta, property_access};
 use rspack_error::{Error, Severity};
 use rspack_util::SpanExt;
 use swc_core::{
@@ -31,12 +31,25 @@ impl ImportMetaPlugin {
     "5".to_string()
   }
 
-  fn import_meta_unknown_property(&self, members: &Vec<String>) -> String {
-    format!(
-      r#"/* unsupported import.meta.{} */ undefined{}"#,
-      members.join("."),
-      property_access(members, 1)
-    )
+  fn import_meta_unknown_property(
+    &self,
+    parser: &JavascriptParser,
+    members: &Vec<String>,
+  ) -> String {
+    let import_meta = parser.javascript_options.import_meta;
+
+    if matches!(
+      import_meta,
+      Some(JavascriptParserImportMeta::PreserveUnknown)
+    ) {
+      format!("import.meta{}", property_access(members, 0))
+    } else {
+      format!(
+        r#"/* unsupported import.meta.{} */ undefined{}"#,
+        members.join("."),
+        property_access(members, 1)
+      )
+    }
   }
 
   fn process_import_meta_resolve(
@@ -257,7 +270,7 @@ impl JavascriptParserPlugin for ImportMetaPlugin {
             content.push(format!(
               r#"[{}]: {}"#,
               serde_json::to_string(&prop.id).expect("json stringify failed"),
-              self.import_meta_unknown_property(&vec![prop.id.to_string()])
+              self.import_meta_unknown_property(parser, &vec![prop.id.to_string()])
             ));
           }
         }
@@ -342,6 +355,15 @@ impl JavascriptParserPlugin for ImportMetaPlugin {
     root_info: &ExportedVariableInfo,
     expr: &swc_core::ecma::ast::MemberExpr,
   ) -> Option<bool> {
+    let import_meta = parser.javascript_options.import_meta;
+
+    if matches!(
+      import_meta,
+      Some(JavascriptParserImportMeta::PreserveUnknown)
+    ) {
+      return Some(true);
+    }
+
     match root_info {
       ExportedVariableInfo::Name(root) => {
         if root == expr_name::IMPORT_META {
@@ -365,6 +387,7 @@ impl JavascriptParserPlugin for ImportMetaPlugin {
                 expr.span().into(),
                 self
                   .import_meta_unknown_property(
+                    parser,
                     &members.members.iter().map(|x| x.to_string()).collect_vec(),
                   )
                   .into(),

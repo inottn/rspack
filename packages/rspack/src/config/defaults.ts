@@ -119,6 +119,7 @@ export const applyRspackOptionsDefaults = (
     mode: options.mode,
     uniqueName: options.output.uniqueName,
     deferImport: options.experiments.deferImport,
+    outputModule: options.experiments.outputModule,
   });
 
   applyOutputDefaults(options.output, {
@@ -310,7 +311,10 @@ const applySnapshotDefaults = (
 
 const applyJavascriptParserOptionsDefaults = (
   parserOptions: JavascriptParserOptions,
-  { deferImport }: { deferImport?: boolean },
+  {
+    deferImport,
+    outputModule,
+  }: { deferImport?: boolean; outputModule?: boolean },
 ) => {
   D(parserOptions, 'dynamicImportMode', 'lazy');
   D(parserOptions, 'dynamicImportPrefetch', false);
@@ -328,7 +332,7 @@ const applyJavascriptParserOptionsDefaults = (
   D(parserOptions, 'commonjs', true);
   D(parserOptions, 'importDynamic', true);
   D(parserOptions, 'worker', ['...']);
-  D(parserOptions, 'importMeta', true);
+  D(parserOptions, 'importMeta', outputModule ? 'preserve-unknown' : true);
   D(parserOptions, 'typeReexportsPresence', 'no-tolerant');
   D(parserOptions, 'jsx', false);
   D(parserOptions, 'deferImport', deferImport);
@@ -362,6 +366,7 @@ const applyModuleDefaults = (
     mode,
     uniqueName,
     deferImport,
+    outputModule,
   }: {
     cache: boolean;
     asyncWebAssembly: boolean;
@@ -370,6 +375,7 @@ const applyModuleDefaults = (
     mode?: Mode;
     uniqueName?: string;
     deferImport?: boolean;
+    outputModule?: boolean;
   },
 ) => {
   assertNotNill(module.parser);
@@ -394,6 +400,7 @@ const applyModuleDefaults = (
   assertNotNill(module.parser.javascript);
   applyJavascriptParserOptionsDefaults(module.parser.javascript, {
     deferImport,
+    outputModule,
   });
 
   F(module.parser, JSON_MODULE_TYPE, () => ({}));

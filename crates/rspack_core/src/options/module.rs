@@ -164,6 +164,24 @@ impl From<&str> for JavascriptParserUrl {
 
 #[cacheable]
 #[derive(Debug, Clone, Copy, MergeFrom)]
+pub enum JavascriptParserImportMeta {
+  Enable,
+  Disable,
+  PreserveUnknown,
+}
+
+impl From<&str> for JavascriptParserImportMeta {
+  fn from(value: &str) -> Self {
+    match value {
+      "false" => Self::Disable,
+      "preserve-unknown" => Self::PreserveUnknown,
+      _ => Self::Enable,
+    }
+  }
+}
+
+#[cacheable]
+#[derive(Debug, Clone, Copy, MergeFrom)]
 pub enum JavascriptParserOrder {
   Disable,
   Order(i32),
@@ -300,7 +318,7 @@ pub struct JavascriptParserOptions {
   pub type_reexports_presence: Option<TypeReexportPresenceMode>,
   pub worker: Option<Vec<String>>,
   pub override_strict: Option<OverrideStrict>,
-  pub import_meta: Option<bool>,
+  pub import_meta: Option<JavascriptParserImportMeta>,
   pub require_alias: Option<bool>,
   pub require_as_expression: Option<bool>,
   pub require_dynamic: Option<bool>,

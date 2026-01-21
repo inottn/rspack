@@ -1,6 +1,6 @@
 use rspack_core::{
-  CachedConstDependency, ConstDependency, NodeDirnameOption, NodeFilenameOption, NodeGlobalOption,
-  RuntimeGlobals, get_context, parse_resource,
+  CachedConstDependency, ConstDependency, JavascriptParserImportMeta, NodeDirnameOption,
+  NodeFilenameOption, NodeGlobalOption, RuntimeGlobals, get_context, parse_resource,
 };
 use rspack_error::{Diagnostic, cyan, yellow};
 use rspack_util::SpanExt;
@@ -601,7 +601,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
           return None;
         }
         // Skip if importMeta is disabled
-        if parser.javascript_options.import_meta == Some(false) {
+        if matches!(
+          parser.javascript_options.import_meta,
+          Some(JavascriptParserImportMeta::Disable)
+        ) {
           return None;
         }
         // Skip if node: false or node.filename is disabled
@@ -637,7 +640,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
           return None;
         }
         // Skip if importMeta is disabled
-        if parser.javascript_options.import_meta == Some(false) {
+        if matches!(
+          parser.javascript_options.import_meta,
+          Some(JavascriptParserImportMeta::Disable)
+        ) {
           return None;
         }
         // Skip if node: false or node.dirname is disabled
@@ -673,7 +679,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
     match for_name {
       expr_name::IMPORT_META_FILENAME => {
         // Skip processing if importMeta is disabled
-        if parser.javascript_options.import_meta == Some(false) {
+        if matches!(
+          parser.javascript_options.import_meta,
+          Some(JavascriptParserImportMeta::Disable)
+        ) {
           return None;
         }
         // Skip processing if node: false or node.filename is disabled
@@ -694,7 +703,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
       }
       expr_name::IMPORT_META_DIRNAME => {
         // Skip processing if importMeta is disabled
-        if parser.javascript_options.import_meta == Some(false) {
+        if matches!(
+          parser.javascript_options.import_meta,
+          Some(JavascriptParserImportMeta::Disable)
+        ) {
           return None;
         }
         // Skip processing if node: false or node.dirname is disabled
@@ -775,7 +787,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
         return None;
       }
       // Skip processing if importMeta is disabled
-      if parser.javascript_options.import_meta == Some(false) {
+      if matches!(
+        parser.javascript_options.import_meta,
+        Some(JavascriptParserImportMeta::Disable)
+      ) {
         return None;
       }
       let property = if for_name == expr_name::IMPORT_META_FILENAME {
@@ -810,7 +825,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
     };
 
     // Skip processing if importMeta is disabled
-    if parser.javascript_options.import_meta == Some(false) {
+    if matches!(
+      parser.javascript_options.import_meta,
+      Some(JavascriptParserImportMeta::Disable)
+    ) {
       return None;
     }
 
@@ -834,7 +852,10 @@ impl JavascriptParserPlugin for NodeStuffPlugin {
     }
 
     // Skip processing if importMeta is disabled
-    if parser.javascript_options.import_meta == Some(false) {
+    if matches!(
+      parser.javascript_options.import_meta,
+      Some(JavascriptParserImportMeta::Disable)
+    ) {
       return None;
     }
 

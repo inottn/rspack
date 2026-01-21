@@ -1110,10 +1110,9 @@ export type JavascriptParserOptions = {
   dynamicImportFetchPriority?: 'low' | 'high' | 'auto';
 
   /**
-   * Enable or disable evaluating import.meta.
-   * @default true
+   * Enable or disable evaluating import.meta. Set to 'preserve-unknown' to preserve unknown properties for runtime evaluation.
    */
-  importMeta?: boolean;
+  importMeta?: boolean | 'preserve-unknown';
 
   /**
    * Enable parsing of new URL() syntax.

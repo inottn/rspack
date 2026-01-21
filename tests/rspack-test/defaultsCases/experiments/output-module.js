@@ -21,6 +21,9 @@ module.exports = {
 		-       "module": undefined,
 		+       "module": true,
 		@@ ... @@
+		-         "importMeta": true,
+		+         "importMeta": "preserve-unknown",
+		@@ ... @@
 		-     "chunkFilename": "[name].js",
 		-     "chunkFormat": "array-push",
 		+     "chunkFilename": "[name].mjs",
